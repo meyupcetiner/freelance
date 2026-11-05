@@ -1,4 +1,4 @@
-// BRIF fiyat rehberi. Bu dosyadaki rakamlar bütçe hesaplayıcısında, talep formunda,
+// Brif fiyat rehberi. Bu dosyadaki rakamlar bütçe hesaplayıcısında, talep formunda,
 // hizmet sayfalarında ve fiyat rehberi sayfasında kullanılır. Yeniden derleme gerekmez.
 //
 // base     : taban tutar (₺)
