@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS talepler (
   butce_tur TEXT NOT NULL, butce INTEGER, rehber_min INTEGER, butce_dusuk INTEGER NOT NULL DEFAULT 0,
   zaman TEXT NOT NULL, zaman_tarih TEXT, ad TEXT NOT NULL, telefon TEXT NOT NULL, eposta TEXT NOT NULL, tercih TEXT NOT NULL,
   firma TEXT NOT NULL DEFAULT '', kvkk_at TEXT NOT NULL, iletisim_izni INTEGER NOT NULL DEFAULT 0,
-  durum TEXT NOT NULL DEFAULT 'yeni', son_iletisim TEXT, kaynak TEXT NOT NULL DEFAULT '{}'
+  durum TEXT NOT NULL DEFAULT 'yeni', son_iletisim TEXT, kaynak TEXT NOT NULL DEFAULT '{}', profil_id INTEGER
 );
 CREATE INDEX IF NOT EXISTS talepler_tarih ON talepler(created_at);
 CREATE INDEX IF NOT EXISTS talepler_durum ON talepler(durum);
@@ -24,3 +24,12 @@ CREATE TABLE IF NOT EXISTS isler (
   created_at TEXT NOT NULL, updated_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS isler_sira ON isler(yayinda, sira, id);
+CREATE TABLE IF NOT EXISTS profiller (
+  id INTEGER PRIMARY KEY, ad TEXT NOT NULL, unvan TEXT NOT NULL DEFAULT '', aciklama TEXT NOT NULL DEFAULT '', alanlar TEXT NOT NULL DEFAULT '',
+  gorsel TEXT NOT NULL DEFAULT '', sira INTEGER NOT NULL DEFAULT 0, yayinda INTEGER NOT NULL DEFAULT 1, updated_at TEXT NOT NULL
+);
+INSERT OR IGNORE INTO profiller (id, ad, unvan, aciklama, alanlar, gorsel, sira, yayinda, updated_at) VALUES
+(1, 'Brif Stüdyo', 'Fotoğraf ve video prodüksiyonu', 'Ürün, e-ticaret, etkinlik ve portre çekimleri; tanıtım filmi, Reels ve kurgu. Çekim planı, ışık ve teslim formatları baştan netleşir.', 'fotograf-video', 'working-on-computer', 1, 1, '2026-11-06T00:00:00Z'),
+(2, 'Brif Tasarım', 'Grafik tasarım, sosyal medya ve içerik', 'Logo ve kurumsal kimlikten sosyal medya tasarımına, içerik planından metin yazımına kadar markanın görünen yüzü.', 'grafik-tasarim,sosyal-medya,metin-icerik', 'brainstorming-ideas', 2, 1, '2026-11-06T00:00:00Z'),
+(3, 'Brif Dijital', 'Web ve performans pazarlaması', 'Web sitesi, landing page ve SEO; Meta ve Google reklamları, e-ticaret optimizasyonu. Ölçüm kurulumu işin bir parçası.', 'web-yazilim,reklam-eticaret', 'reviewing-documents', 3, 1, '2026-11-06T00:00:00Z');
+-- Var olan kurulumda: ALTER TABLE talepler ADD COLUMN profil_id INTEGER;
