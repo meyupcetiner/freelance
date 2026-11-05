@@ -430,8 +430,8 @@ a.w-link:focus-visible { box-shadow: var(--focus); }
 .footer-h { font-weight: 500; margin: 0 0 12px; }
 .site-footer ul { list-style: none; margin: 0; padding: 0; }
 .site-footer li { margin-bottom: 8px; }
-.site-footer a, .site-footer .linklike { color: var(--ink-2); text-decoration: none; }
-.site-footer a:hover, .site-footer .linklike:hover { color: var(--brand); text-decoration: underline; }
+.site-footer a:not(.btn), .site-footer .linklike { color: var(--ink-2); text-decoration: none; }
+.site-footer a:not(.btn):hover, .site-footer .linklike:hover { color: var(--brand); text-decoration: underline; }
 .footer-legal { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid var(--line); margin-top: 48px; padding-top: 20px; color: var(--muted); font-size: .88rem; }
 .footer-legal p { margin: 0; }
 .footer-legal ul { display: flex; flex-wrap: wrap; gap: 6px 18px; }
@@ -726,3 +726,22 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
 .file-list li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 6px; }
 .file-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; font-size: .93rem; }
 .done-ico { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; background: var(--sky); color: var(--ink); margin-bottom: 16px; animation: rise .5s cubic-bezier(.2, .7, .2, 1) both; }
+
+/* ---------- Hizmetler sayfası: kategori kutuları ---------- */
+.svc-page { padding-block: clamp(28px, 4vw, 48px) clamp(56px, 8vw, 96px); }
+.svc-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.svc-grid > li { display: flex; scroll-margin-top: 96px; }
+.svc-grid .svc-art { height: clamp(170px, 16vw, 210px); }
+.svc-body2 { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 20px; border-top: 1px solid var(--line); flex: 1; }
+.svc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.svc-count-sm { font-size: .78rem; font-weight: 500; color: var(--muted); }
+.svc-body2 .svc-title { font-size: 1.3rem; }
+.svc-subs { font-size: .86rem; color: var(--muted); line-height: 1.5; margin-top: 4px; }
+.svc-go { margin-top: auto; padding-top: 14px; display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; font-size: .9rem; font-weight: 500; padding: 8px 14px; border-radius: 999px; background: var(--bg-gray); transition: background-color .2s; margin-top: 16px; }
+.svc-go svg { transition: transform .2s; }
+.svc-tile:hover .svc-go { background: var(--sky); }
+.svc-tile:hover .svc-go svg { transform: translateX(3px); }
+.svc-guides { margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line); }
+.svc-guides ul { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: .92rem; }
+@media (max-width: 960px) { .svc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .svc-grid { grid-template-columns: 1fr; } }
