@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ornek.com/sitemap.xml
+Sitemap: https://freelance.m-eyupcetiner.workers.dev/sitemap.xml
