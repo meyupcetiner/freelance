@@ -33,3 +33,6 @@ INSERT OR IGNORE INTO profiller (id, ad, unvan, aciklama, alanlar, gorsel, sira,
 (2, 'Brif Tasarım', 'Grafik tasarım, sosyal medya ve içerik', 'Logo ve kurumsal kimlikten sosyal medya tasarımına, içerik planından metin yazımına kadar markanın görünen yüzü.', 'grafik-tasarim,sosyal-medya,metin-icerik', 'brainstorming-ideas', 2, 1, '2026-11-06T00:00:00Z'),
 (3, 'Brif Dijital', 'Web ve performans pazarlaması', 'Web sitesi, landing page ve SEO; Meta ve Google reklamları, e-ticaret optimizasyonu. Ölçüm kurulumu işin bir parçası.', 'web-yazilim,reklam-eticaret', 'reviewing-documents', 3, 1, '2026-11-06T00:00:00Z');
 -- Var olan kurulumda: ALTER TABLE talepler ADD COLUMN profil_id INTEGER;
+-- Görsel düzenleyici
+CREATE TABLE IF NOT EXISTS tasarimlar (yol TEXT PRIMARY KEY, taslak TEXT, taslak_at TEXT, yayin TEXT, yayin_at TEXT);
+CREATE TABLE IF NOT EXISTS medya (id INTEGER PRIMARY KEY, ad TEXT NOT NULL, tur TEXT NOT NULL, boyut INTEGER NOT NULL, alt TEXT NOT NULL DEFAULT '', hash TEXT NOT NULL UNIQUE, veri BLOB NOT NULL, created_at TEXT NOT NULL);

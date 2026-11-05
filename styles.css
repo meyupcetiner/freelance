@@ -781,3 +781,39 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
 .svc-hero-facts li { display: inline-flex; align-items: center; gap: 8px; }
 .svc-hero-art { justify-self: end; width: min(100%, 340px); height: auto; margin-bottom: -1px; }
 @media (max-width: 760px) { .svc-hero-grid { grid-template-columns: 1fr; } .svc-hero-art { justify-self: center; width: 230px; margin-top: -8px; } .svc-hero-grid > div { padding-bottom: 8px; } }
+
+/* ---------- Görsel yer tutucuları (gerçek görseller gelene kadar) ---------- */
+.ph { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 16px; text-align: center; background: #F4F5F1; border: 1px dashed #C9CDC2; border-radius: inherit; color: #6B7066; font-weight: 400; }
+.ph-n { font-size: .78rem; letter-spacing: .14em; color: #8A8F84; }
+.ph-t { font-size: .92rem; line-height: 1.4; max-width: 26ch; }
+.ph-r { font-size: .74rem; color: #9A9E94; }
+.ph-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; border-radius: inherit; }
+.svc-art, .w-media { position: relative; }
+.cl-video .ph-t, .cl-video .ph-r { display: none; }
+
+/* ---------- Görsel düzenleyici ile eklenen bölümler ---------- */
+.ph.ph-full { border: 0; padding: 0; background: none; }
+.cb { padding: clamp(40px, 6vw, 72px) 0; }
+.cb-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; align-items: start; }
+.cb-item { grid-column: span 12; min-width: 0; }
+.cb-h { font-size: clamp(1.8rem, 3.6vw, 2.8rem); line-height: 1.05; letter-spacing: -0.035em; margin: 0; }
+.cb-h3 { font-size: 1.3rem; letter-spacing: -0.02em; margin: 0 0 6px; }
+.cb-p { color: var(--ink-2); margin: 0; font-size: 1.04rem; }
+.cb-media { position: relative; aspect-ratio: 4/3; border-radius: 18px; overflow: hidden; background: var(--bg-gray); }
+.cb-media > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cb-gorsel-metin { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 56px); align-items: center; }
+.cb-gm-txt { display: grid; gap: 12px; justify-items: start; }
+.cb-hizmet-karti { background: var(--white); border-radius: 22px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); }
+.cb-hizmet-karti .cb-media { border-radius: 0; }
+.cb-card-body { padding: 18px 20px 20px; display: grid; gap: 6px; justify-items: start; }
+.cb-kutu { border: 1px solid rgba(25, 25, 25, .14); border-radius: 18px; padding: 22px; background: var(--white); }
+.cb-banner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; background: var(--ink); color: var(--white); border-radius: 24px; padding: clamp(28px, 4vw, 48px); }
+.cb-banner .cb-p { color: rgba(255, 255, 255, .72); margin-top: 8px; }
+.cb-banner-txt { max-width: 640px; }
+.cb-buton { display: flex; }
+@media (max-width: 960px) { .cb-item { grid-column: span 12; } }
+@media (max-width: 600px) { .cb-grid { gap: 16px; } .cb-item { grid-column: span 12 !important; } .cb-gorsel-metin { grid-template-columns: 1fr; } }
+.med-grid { list-style: none; margin: 16px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.med-grid li { background: var(--white); border-radius: 14px; padding: 10px; box-shadow: 0 0 0 1px var(--line); display: grid; gap: 8px; }
+.med-grid img { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; display: block; }
+.med-grid input { width: 100%; }
