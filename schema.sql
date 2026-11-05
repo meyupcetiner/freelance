@@ -18,3 +18,9 @@ CREATE TABLE IF NOT EXISTS dosyalar (id INTEGER PRIMARY KEY, talep_id INTEGER NO
 CREATE INDEX IF NOT EXISTS dosyalar_talep ON dosyalar(talep_id);
 CREATE TABLE IF NOT EXISTS istek_sinir (k TEXT NOT NULL, ts INTEGER NOT NULL);
 CREATE INDEX IF NOT EXISTS istek_sinir_k ON istek_sinir(k, ts);
+CREATE TABLE IF NOT EXISTS isler (
+  id INTEGER PRIMARY KEY, baslik TEXT NOT NULL, kategori TEXT NOT NULL, aciklama TEXT NOT NULL DEFAULT '', link TEXT NOT NULL DEFAULT '',
+  sira INTEGER NOT NULL DEFAULT 0, yayinda INTEGER NOT NULL DEFAULT 1, tur TEXT NOT NULL, boyut INTEGER NOT NULL, gorsel BLOB NOT NULL,
+  created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS isler_sira ON isler(yayinda, sira, id);
