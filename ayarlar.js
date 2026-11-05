@@ -6,4 +6,8 @@ window.SITE_AYAR = {
   email: "",
   // Google Analytics 4 ölçüm kimliği (ör. "G-ABC123"). Yalnızca ziyaretçi çerez onayı verirse yüklenir.
   ga: "",
+  // Logo dosyası (ör. "/logo.svg"). Boşsa yazı logosu kullanılır.
+  logo: "",
+  // Örnek işler henüz boşken gösterilecek portfolyo bağlantısı (https://...). Boşsa bağlantı görünmez.
+  portfolyo: "",
 };
