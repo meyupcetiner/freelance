@@ -1,9 +1,16 @@
 {
   "name": "freelance",
+  "main": "worker.js",
   "compatibility_date": "2026-11-01",
   "assets": {
     "directory": "./",
+    "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
-    "not_found_handling": "404-page"
-  }
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*", "/admin", "/admin/*"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "brif-db", "database_id": "8219d601-bde3-4418-92b8-2c9c226ff0c0" }
+  ],
+  "observability": { "enabled": true }
 }
