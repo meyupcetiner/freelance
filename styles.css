@@ -817,3 +817,21 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
 .med-grid li { background: var(--white); border-radius: 14px; padding: 10px; box-shadow: 0 0 0 1px var(--line); display: grid; gap: 8px; }
 .med-grid img { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; display: block; }
 .med-grid input { width: 100%; }
+
+/* Hizmetler sayfası: daha dar ve sıkı düzen */
+.svc-narrow { --wrap: 1040px; }
+.svc-page .svc-grid { gap: 14px; }
+.svc-page .svc-grid .svc-art { height: clamp(140px, 13vw, 168px); }
+.svc-page .svc-body2 { padding: 14px 16px 16px; gap: 4px; }
+.svc-page .svc-body2 .svc-title { font-size: 1.12rem; }
+.svc-page .svc-short { font-size: .9rem; }
+.svc-page .svc-subs { font-size: .8rem; }
+.svc-page .svc-go { margin-top: 12px; padding: 6px 12px; font-size: .84rem; }
+.svc-page .profiles { margin-top: 48px; padding-top: 36px; }
+.svc-page .prof-grid { gap: 14px; }
+.svc-hero { padding-top: clamp(20px, 3vw, 36px); }
+.svc-hero .svc-hero-art { width: min(100%, 250px); }
+.svc-hero h1 { font-size: clamp(2.2rem, 4.2vw, 3.4rem); }
+.svc-hero-grid > div { padding-bottom: clamp(20px, 3vw, 36px); }
+.svc-hero-facts { margin-top: 16px; }
+@media (max-width: 600px) { .svc-hero .svc-hero-art { display: none; } .svc-hero { border-bottom: 0; } }
