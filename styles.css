@@ -835,3 +835,4 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
 .svc-hero-grid > div { padding-bottom: clamp(20px, 3vw, 36px); }
 .svc-hero-facts { margin-top: 16px; }
 @media (max-width: 600px) { .svc-hero .svc-hero-art { display: none; } .svc-hero { border-bottom: 0; } }
+.seo-copy .prose p { font-size: .9rem; color: var(--muted, #6B7066); } .seo-copy h2 { font-size: 1.1rem; }
