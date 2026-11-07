@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
 
 Sitemap: https://freelance.m-eyupcetiner.workers.dev/sitemap.xml
