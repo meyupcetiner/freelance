@@ -958,3 +958,14 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
 .wordmark { font-family: "Mantri", var(--display); font-weight: 700; letter-spacing: -0.035em; }
 .pf-hero h1 { letter-spacing: -0.04em; }
 .wordmark { gap: 14px; } .wordmark-txt { display: block; height: 21.4px; width: auto; }
+/* Ana sayfa başlığı: iki satır; tıklanabilir alan etiketleri; Hizmetler oku */
+.hero2-h { font-size: clamp(2.3rem, 4.4vw, 4.1rem); max-width: none; }
+.hero2-h .h-line { display: block; }
+@media (min-width: 640px) { .hero2-h .h-line { white-space: nowrap; } }
+.tags li { padding: 0; border: 0; background: none; }
+.tags li a { display: block; padding: 4px 11px; border-radius: 999px; border: 1px solid #D5D8CF; background: var(--white); color: var(--ink-2); text-decoration: none; transition: border-color .15s, background-color .15s, color .15s; }
+.tags li a:hover { border-color: var(--ink); color: var(--ink); }
+.tags li:first-child { background: none; }
+.tags li:first-child a { background: var(--ink); color: var(--white); border-color: var(--ink); }
+.main-nav .mega-toggle { display: inline-flex; align-items: center; gap: 4px; }
+.main-nav .mega-toggle svg { margin-top: 1px; }
