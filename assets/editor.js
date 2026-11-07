@@ -40,7 +40,7 @@ html{scroll-behavior:auto!important}
 .reveal{opacity:1!important;transform:none!important}
 .cb-grid:empty{min-height:120px;border:1.5px dashed #C9CDC2;border-radius:16px}
 .cb-grid:empty::before{content:"Bo\u015F b\xF6l\xFCm \u2014 soldan \xF6ge ekle";grid-column:1/-1;align-self:center;text-align:center;color:#8A8F84;font-size:14px}
-#ed-ov{position:absolute;left:0;top:0;width:0;height:0;z-index:2147483000;font:500 12px/1 Mantri,Inter,system-ui,sans-serif}
+#ed-ov{position:absolute;left:0;top:0;width:0;height:0;z-index:2147483000;font:500 12px/1 Geist,Inter,system-ui,sans-serif}
 #ed-ov .ed-ov-box{position:absolute;pointer-events:none;border:1px solid transparent}
 #ed-ov .ed-ov-bar{position:absolute;display:flex;align-items:center;gap:2px;background:#191919;color:#fff;border-radius:8px;padding:3px;box-shadow:0 8px 20px -8px rgba(0,0,0,.4);white-space:nowrap}
 #ed-ov .ed-ov-name{padding:0 8px;color:#C8F5A8}

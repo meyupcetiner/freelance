@@ -2,7 +2,7 @@
 :root { --ink: #191919; --line: #E4E6E0; --muted: #6B7066; --lime: #77EA2F; --bg: #F2F3EF; --blue: #4C7FF0; --danger: #C53030; }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
-body.ed-body { font: 400 14px/1.45 Mantri, Inter, system-ui, sans-serif; color: var(--ink); background: var(--bg); overflow: hidden; }
+body.ed-body { font: 400 14px/1.45 Geist, Inter, system-ui, sans-serif; color: var(--ink); background: var(--bg); overflow: hidden; }
 button, input, select, textarea { font: inherit; color: inherit; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .ed { display: grid; grid-template-columns: 248px minmax(0, 1fr) 312px; grid-template-rows: 56px minmax(0, 1fr); height: 100vh; }

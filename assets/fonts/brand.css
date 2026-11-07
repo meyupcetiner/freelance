@@ -1,5 +1,4 @@
-/* Mantri — Brif'in font ailesi (Regular 400, Medium 500, Bold 700). Türkçe karakterleri içerir.
-   ₺ işareti Mantri'de olmadığı için yalnızca o karakter yedek fonttan (Inter) gelir. */
-@font-face { font-family: "Mantri"; src: url(/assets/fonts/Mantri-Regular.woff2) format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: "Mantri"; src: url(/assets/fonts/Mantri-Medium.woff2) format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: "Mantri"; src: url(/assets/fonts/Mantri-Bold.woff2) format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+/* Brif yazı tipleri (SIL Open Font License, Türkçe karakter alt kümesi)
+   Başlık: Bricolage Grotesque (değişken, 500–800) · Metin: Geist (değişken, 400–700) */
+@font-face { font-family: "Bricolage Grotesque"; src: url(/assets/fonts/BricolageGrotesque.woff) format("woff"); font-weight: 500 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "Geist"; src: url(/assets/fonts/Geist.woff) format("woff"); font-weight: 400 700; font-style: normal; font-display: swap; }
