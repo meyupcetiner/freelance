@@ -1,4 +1,4 @@
-/* Brif yazı tipleri (SIL Open Font License, Türkçe karakter alt kümesi)
-   Başlık: Bricolage Grotesque (değişken, 500–800) · Metin: Geist (değişken, 400–700) */
-@font-face { font-family: "Bricolage Grotesque"; src: url(/assets/fonts/BricolageGrotesque.woff) format("woff"); font-weight: 500 800; font-style: normal; font-display: swap; }
+/* Brif yazı tipleri — Başlık: Schibsted Grotesk (OFL, 500–900) · Metin: Geist (OFL, 400–700) · Logo: Mantri Bold */
+@font-face { font-family: "Schibsted Grotesk"; src: url(/assets/fonts/SchibstedGrotesk.woff) format("woff"); font-weight: 500 900; font-style: normal; font-display: swap; }
 @font-face { font-family: "Geist"; src: url(/assets/fonts/Geist.woff) format("woff"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Mantri"; src: url(/assets/fonts/Mantri-Bold.woff2) format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
