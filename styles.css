@@ -957,3 +957,4 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
 @media (max-width: 880px) { .seg { order: 10; margin: 0 0 10px; } .main-nav { margin-left: 0; } .header-cta { margin-left: auto; } }
 .wordmark { font-family: "Mantri", var(--display); font-weight: 700; letter-spacing: -0.035em; }
 .pf-hero h1 { letter-spacing: -0.04em; }
+.wordmark { gap: 14px; } .wordmark-txt { display: block; height: 21.4px; width: auto; }
