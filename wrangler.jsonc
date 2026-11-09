@@ -1,9 +1,9 @@
 {
   "name": "freelance",
-  "main": "worker.js",
+  "main": "site/worker.js",
   "compatibility_date": "2026-11-01",
   "assets": {
-    "directory": "./",
+    "directory": "./site",
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",

@@ -1,6 +1,0 @@
-wrangler.jsonc
-.assetsignore
-.gitignore
-.git
-worker.js
-schema.sql
