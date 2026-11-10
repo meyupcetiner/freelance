@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /api/
 Disallow: /blog-sablon
 
-Sitemap: https://freelance.m-eyupcetiner.workers.dev/sitemap.xml
+Sitemap: https://getbrif.com/sitemap.xml

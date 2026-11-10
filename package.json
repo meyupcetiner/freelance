@@ -9,8 +9,8 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "export": "node scripts/export-static.mjs https://freelance.m-eyupcetiner.workers.dev",
-    "site": "node scripts/build.mjs && node scripts/export-static.mjs https://freelance.m-eyupcetiner.workers.dev",
+    "export": "node scripts/export-static.mjs https://getbrif.com",
+    "site": "node scripts/build.mjs && node scripts/export-static.mjs https://getbrif.com",
     "yerel": "node tools/worker-harness.mjs site data/yerel.db 3000",
     "typecheck": "tsc --noEmit"
   },

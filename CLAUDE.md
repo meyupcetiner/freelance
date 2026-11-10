@@ -1,7 +1,7 @@
 # Brif — proje rehberi
 
 Brif, SEO'dan müşteri getiren bir hizmet talep platformu (fotoğraf/video, tasarım, web/reklam/sosyal medya).
-Canlı: https://freelance.m-eyupcetiner.workers.dev — Cloudflare Workers + D1.
+Canlı: https://getbrif.com — Cloudflare Workers + D1.
 
 ## Sahibi ve çalışma tarzı
 - Sahibi Eyüp (fotoğrafçı/girişimci). **Türkçe konuş, kısa cevap ver (2–3 satır).** Uzun açıklama istemedikçe yazma.
@@ -53,7 +53,7 @@ Test araçları (`tools/`, Playwright gerekir: `npm i -D playwright && npx playw
 1. Kaynağı değiştir → `npm run site`
 2. Yerelde kontrol et (gerekirse ekran görüntüsü)
 3. `git add -A && git commit && git push`
-4. Kontrol: Cloudflare → Workers & Pages → freelance → Builds. GitHub'daki check-run, deploy başarılı olsa bile "failure" gösterebiliyor; asıl sonuç Cloudflare build log'unda.
+4. Kontrol: Cloudflare → Workers & Pages → getbrifcom → Builds. GitHub'daki check-run, deploy başarılı olsa bile "failure" gösterebiliyor; asıl sonuç Cloudflare build log'unda.
 
 ## Yapılacaklar (Eyüp'e hatırlatılacak)
 - Search Console + Bing Webmaster'a siteyi ekle, sitemap gönder; Google İşletme Profili.
