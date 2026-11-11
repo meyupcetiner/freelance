@@ -63,7 +63,38 @@ try {
   }
   writeFileSync(join(OUT, "404.html"), await (await fetch(B + "/bulunamadi-404")).text());
   writeFileSync(join(OUT, "sitemap.xml"), sitemap);
-  writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /blog-sablon\n\nSitemap: ${SITE}/sitemap.xml\n`);
+  // Arama motorları ve yapay zekâ tarayıcıları açıkça izinli (AI aramalarında görünmek için)
+  const AI_BOTS = ["GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User", "anthropic-ai", "PerplexityBot", "Perplexity-User", "Google-Extended", "Applebot-Extended", "Bingbot", "CCBot", "meta-externalagent", "Amazonbot", "DuckAssistBot", "YandexBot"];
+  const block = "Allow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /blog-sablon\n";
+  writeFileSync(join(OUT, "robots.txt"), `User-agent: *\n${block}\n${AI_BOTS.map((b) => `User-agent: ${b}\n${block}`).join("\n")}\nSitemap: ${SITE}/sitemap.xml\n`);
+  writeFileSync(join(OUT, "llms.txt"), `# Brif
+
+> Brif, İstanbul merkezli fotoğraf/video prodüksiyonu, grafik tasarım ve dijital pazarlama (web sitesi, Meta ve Google reklam yönetimi, sosyal medya yönetimi) hizmetleri için talep platformudur. Müşteri ihtiyacını kısa bir formla anlatır, kapsamına ve bütçesine uygun yazılı teklif alır.
+
+## Alanlar
+- [Brif Stüdyo — Fotoğraf ve video](${SITE}/): ürün, katalog ve reklam fotoğrafı, tanıtım filmi, Reels, etkinlik çekimi, video kurgu
+- [Brif Tasarım — Grafik ve içerik](${SITE}/tasarim): logo, kurumsal kimlik, katalog, ambalaj, sosyal medya tasarımı, metin ve içerik yazımı
+- [Brif Dijital — Web, reklam ve sosyal medya](${SITE}/dijital): kurumsal web sitesi, e-ticaret, Meta ve Google reklam yönetimi, sosyal medya yönetimi
+
+## Hizmet sayfaları
+- [Ürün fotoğrafçısı](${SITE}/hizmetler/urun-fotografcisi)
+- [Tanıtım videosu çekimi](${SITE}/hizmetler/tanitim-videosu-cekimi)
+- [Reels video çekimi](${SITE}/hizmetler/reels-video-cekimi)
+- [Etkinlik fotoğrafçısı](${SITE}/hizmetler/etkinlik-fotografcisi)
+- [Düğün fotoğrafçısı](${SITE}/hizmetler/dugun-fotografcisi)
+- [Video editörü](${SITE}/hizmetler/video-editoru)
+- [Grafik tasarım](${SITE}/hizmetler/grafik-tasarim)
+- [Sosyal medya yönetimi](${SITE}/hizmetler/sosyal-medya-yonetimi)
+- [Meta reklam yönetimi](${SITE}/hizmetler/meta-reklam-yonetimi)
+- [Tüm hizmetler](${SITE}/hizmetler)
+
+## Bilgi
+- [Fiyat rehberi](${SITE}/fiyat-rehberi): hizmetlere göre başlangıç fiyat aralıkları (TL)
+- [Nasıl çalışır?](${SITE}/nasil-calisir)
+- [Sık sorulan sorular](${SITE}/sss)
+- [Blog](${SITE}/blog): fiyat ve süreç rehberleri
+- [Talep oluştur](${SITE}/talep-olustur)
+`);
   writeFileSync(join(OUT, ".assetsignore"), "worker.js\nschema.sql\n.assetsignore\n"); // Worker kodu ve şema statik dosya olarak yayınlanmasın
 } finally {
   srv.kill();

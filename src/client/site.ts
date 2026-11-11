@@ -201,3 +201,21 @@ document.addEventListener("click", (e) => {
   }
 });
 
+
+// ------------------------------------------------------------------ ziyaret sayacı (çerezsiz; admin → Ziyaretçiler)
+try {
+  const u = new URL(location.href);
+  let first = false;
+  try { first = !sessionStorage.getItem("brif_s"); sessionStorage.setItem("brif_s", "1"); } catch { first = true; }
+  const body = JSON.stringify({
+    p: location.pathname,
+    ti: document.title,
+    r: first ? document.referrer : "",
+    u: first ? (u.searchParams.get("utm_source") || "") : "",
+    f: first ? 1 : 0,
+    wd: (navigator as Navigator & { webdriver?: boolean }).webdriver ? 1 : 0,
+  });
+  if (!navigator.sendBeacon || !navigator.sendBeacon("/api/ziyaret", new Blob([body], { type: "application/json" }))) {
+    fetch("/api/ziyaret", { method: "POST", body, keepalive: true, headers: { "Content-Type": "application/json" } }).catch(() => {});
+  }
+} catch { /* sayaç siteyi etkilemesin */ }

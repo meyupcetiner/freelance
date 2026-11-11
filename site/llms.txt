@@ -1,0 +1,27 @@
+# Brif
+
+> Brif, İstanbul merkezli fotoğraf/video prodüksiyonu, grafik tasarım ve dijital pazarlama (web sitesi, Meta ve Google reklam yönetimi, sosyal medya yönetimi) hizmetleri için talep platformudur. Müşteri ihtiyacını kısa bir formla anlatır, kapsamına ve bütçesine uygun yazılı teklif alır.
+
+## Alanlar
+- [Brif Stüdyo — Fotoğraf ve video](https://getbrif.com/): ürün, katalog ve reklam fotoğrafı, tanıtım filmi, Reels, etkinlik çekimi, video kurgu
+- [Brif Tasarım — Grafik ve içerik](https://getbrif.com/tasarim): logo, kurumsal kimlik, katalog, ambalaj, sosyal medya tasarımı, metin ve içerik yazımı
+- [Brif Dijital — Web, reklam ve sosyal medya](https://getbrif.com/dijital): kurumsal web sitesi, e-ticaret, Meta ve Google reklam yönetimi, sosyal medya yönetimi
+
+## Hizmet sayfaları
+- [Ürün fotoğrafçısı](https://getbrif.com/hizmetler/urun-fotografcisi)
+- [Tanıtım videosu çekimi](https://getbrif.com/hizmetler/tanitim-videosu-cekimi)
+- [Reels video çekimi](https://getbrif.com/hizmetler/reels-video-cekimi)
+- [Etkinlik fotoğrafçısı](https://getbrif.com/hizmetler/etkinlik-fotografcisi)
+- [Düğün fotoğrafçısı](https://getbrif.com/hizmetler/dugun-fotografcisi)
+- [Video editörü](https://getbrif.com/hizmetler/video-editoru)
+- [Grafik tasarım](https://getbrif.com/hizmetler/grafik-tasarim)
+- [Sosyal medya yönetimi](https://getbrif.com/hizmetler/sosyal-medya-yonetimi)
+- [Meta reklam yönetimi](https://getbrif.com/hizmetler/meta-reklam-yonetimi)
+- [Tüm hizmetler](https://getbrif.com/hizmetler)
+
+## Bilgi
+- [Fiyat rehberi](https://getbrif.com/fiyat-rehberi): hizmetlere göre başlangıç fiyat aralıkları (TL)
+- [Nasıl çalışır?](https://getbrif.com/nasil-calisir)
+- [Sık sorulan sorular](https://getbrif.com/sss)
+- [Blog](https://getbrif.com/blog): fiyat ve süreç rehberleri
+- [Talep oluştur](https://getbrif.com/talep-olustur)

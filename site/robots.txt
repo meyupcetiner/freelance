@@ -4,4 +4,106 @@ Disallow: /admin
 Disallow: /api/
 Disallow: /blog-sablon
 
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: Claude-User
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: CCBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
+User-agent: YandexBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /blog-sablon
+
 Sitemap: https://getbrif.com/sitemap.xml

@@ -1,5 +1,6 @@
 // Brif — Cloudflare Worker: talep API'si (D1'e kayıt) + yönetim paneli.
 // Statik sayfalar ASSETS üzerinden sunulur; yayınlanmış bir görsel tasarımı olan sayfalara Worker tasarımı uygular.
+import { recordHit, markAdmin, stats as ziyaretStats } from "./ziyaret";
 import { CATEGORIES, STATUSES, TIMINGS, PREFS, SERVICES, categoryBySlug } from "../data/catalog";
 import { answerRows, clean, FILE_RULES, validateTalep } from "../lib/talep";
 import type { Pricing } from "../lib/pricing";
@@ -181,7 +182,7 @@ function layout(title: string, body: string, authed = true) {
 <body class="adm">${
     authed
       ? `<div class="adm-shell"><aside class="adm-side"><div class="adm-brand"><a href="/admin">Brif</a></div>
-<nav aria-label="Yönetim menüsü"><ul><li><a href="/admin">Talepler</a></li><li><a href="/admin/isler">Örnek işler</a></li><li><a href="/admin/profiller">Profiller</a></li><li><a href="/admin/blog">Blog</a></li><li><a href="/admin/duzenleyici">Görsel düzenleyici</a></li><li><a href="/admin/medya">Görseller</a></li><li><a href="/admin/talepler.csv">CSV indir</a></li><li><a href="/" target="_blank" rel="noopener">Siteyi aç</a></li></ul></nav>
+<nav aria-label="Yönetim menüsü"><ul><li><a href="/admin/ozet">Özet</a></li><li><a href="/admin">Talepler</a></li><li><a href="/admin/ziyaretciler">Ziyaretçiler</a></li><li><a href="/admin/isler">Örnek işler</a></li><li><a href="/admin/profiller">Profiller</a></li><li><a href="/admin/blog">Blog</a></li><li><a href="/admin/duzenleyici">Görsel düzenleyici</a></li><li><a href="/admin/medya">Görseller</a></li><li><a href="/admin/talepler.csv">CSV indir</a></li><li><a href="/" target="_blank" rel="noopener">Siteyi aç</a></li></ul></nav>
 <div class="adm-user"><form method="post" action="/admin/cikis"><button type="submit" class="linklike small">Çıkış yap</button></form></div></aside>
 <main class="adm-main" id="icerik">${body}</main></div>`
       : `<main class="adm-login" id="icerik">${body}</main>`
@@ -882,6 +883,83 @@ ${
   );
 }
 
+// ------------------------------------------------------------------ özet ve ziyaretçiler
+const nf = (n: number) => new Intl.NumberFormat("tr-TR").format(n);
+const barList = (rows: [string, number][], total: number, fmt: (k: string) => string = h) =>
+  rows.length
+    ? `<ul class="vbar">${rows.map(([k, n]) => `<li><span class="vbar-k">${fmt(k)}</span><span class="vbar-n">${nf(n)}</span><span class="vbar-b" style="width:${Math.max(3, Math.round((n / Math.max(1, total)) * 100))}%"></span></li>`).join("")}</ul>`
+    : `<p class="muted small">Henüz veri yok.</p>`;
+function dailyChart(daily: Record<string, number>, days: number) {
+  const keys: string[] = [];
+  for (let i = days - 1; i >= 0; i--) keys.push(new Date(Date.now() + 3 * 36e5 - i * 864e5).toISOString().slice(0, 10));
+  const max = Math.max(1, ...keys.map((k) => daily[k] || 0));
+  const step = days > 31 ? Math.ceil(days / 15) : days > 14 ? 3 : 1;
+  return `<div class="vchart" role="img" aria-label="Günlük ziyaretçi grafiği">${keys
+    .map((k, i) => {
+      const n = daily[k] || 0;
+      const lbl = new Date(k + "T12:00:00Z").toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+      return `<div class="vc-col" title="${lbl}: ${n} ziyaretçi"><span class="vc-n">${n || ""}</span><span class="vc-bar" style="height:${Math.round((n / max) * 100)}%"></span><span class="vc-l">${i % step === 0 || i === keys.length - 1 ? lbl : ""}</span></div>`;
+    })
+    .join("")}</div>`;
+}
+const ago = (t: number) => {
+  const m = Math.round((Date.now() - t) / 6e4);
+  return m < 1 ? "şimdi" : m < 60 ? `${m} dk önce` : m < 1440 ? `${Math.round(m / 60)} sa önce` : new Date(t).toLocaleString("tr-TR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" });
+};
+
+async function ziyaretView(env: Env, url: URL) {
+  const days = [1, 7, 30, 90].includes(Number(url.searchParams.get("gun"))) ? Number(url.searchParams.get("gun")) : 7;
+  const s = await ziyaretStats(env.DB, days);
+  const talepN = (await env.DB.prepare("SELECT COUNT(*) AS n FROM talepler WHERE created_at > ?").bind(new Date(Date.now() - days * 864e5).toISOString()).first<{ n: number }>())?.n ?? 0;
+  const conv = s.visitors ? ((talepN / s.visitors) * 100).toFixed(1).replace(".", ",") : "0";
+  const tabs = [1, 7, 30, 90].map((d) => `<a class="vtab${d === days ? " is-on" : ""}" href="?gun=${d}">${d === 1 ? "Bugün" : `Son ${d} gün`}</a>`).join("");
+  const pageLink = (p: string) => `<a href="${h(p)}" target="_blank" rel="noopener">${h(p)}</a>`;
+  return layout(
+    "Ziyaretçiler",
+    `<div class="adm-head"><h1>Ziyaretçiler</h1><nav class="vtabs" aria-label="Zaman aralığı">${tabs}</nav></div>
+<div class="kpis"><div><span class="kpi-n">${nf(s.visitors)}</span><span class="kpi-l">Tekil ziyaretçi</span></div><div><span class="kpi-n">${nf(s.visits)}</span><span class="kpi-l">Ziyaret</span></div><div><span class="kpi-n">${nf(s.views)}</span><span class="kpi-l">Sayfa görüntüleme</span></div><div><span class="kpi-n">${nf(talepN)}</span><span class="kpi-l">Talep · %${conv} dönüşüm</span></div></div>
+<div class="kpis kpis-sm"><div><span class="kpi-n">${nf(s.today)}</span><span class="kpi-l">Bugün</span></div><div><span class="kpi-n">${s.visits ? (s.views / s.visits).toFixed(1).replace(".", ",") : "0"}</span><span class="kpi-l">Ziyaret başına sayfa</span></div><div><span class="kpi-n">%${s.bounce}</span><span class="kpi-l">Tek sayfada çıkan</span></div><div><span class="kpi-n">${nf(s.formStarts)}</span><span class="kpi-l">Talep formu açılışı</span></div></div>
+${days > 1 ? `<section class="panel"><h2 class="h-sm">Günlük ziyaretçi</h2>${dailyChart(s.daily, days)}</section>` : ""}
+<div class="grid-2"><section class="panel"><h2 class="h-sm">Nereden geliyorlar?</h2>${barList(s.sources, s.visits)}</section>
+<section class="panel"><h2 class="h-sm">En çok bakılan sayfalar</h2>${s.pages.length ? `<ul class="vbar">${s.pages.map(([p, t, n]) => `<li><span class="vbar-k">${h(t)}<small>${pageLink(p)}</small></span><span class="vbar-n">${nf(n)}</span><span class="vbar-b" style="width:${Math.max(3, Math.round((n / Math.max(1, s.pages[0][2])) * 100))}%"></span></li>`).join("")}</ul>` : `<p class="muted small">Henüz veri yok.</p>`}</section></div>
+<div class="grid-2"><section class="panel"><h2 class="h-sm">Şehir</h2>${barList(s.cities, s.visits)}</section><section class="panel"><h2 class="h-sm">Cihaz</h2>${barList(s.devices, s.visits)}</section></div>
+<section class="panel"><h2 class="h-sm">Son ziyaretler</h2>${
+      s.recent.length
+        ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Zaman</th><th>Kaynak</th><th>Şehir · cihaz</th><th>Gezdiği sayfalar</th></tr></thead><tbody>${s.recent
+            .map((v) => `<tr><td class="nowrap">${ago(v.start)}</td><td>${h(v.src)}</td><td>${h(v.city || "Bilinmiyor")} · ${h(v.dev)}</td><td class="vpath">${v.pages.slice(0, 8).map((x) => `<span title="${h(x.ti)}">${h(x.p)}</span>`).join(" → ")}${v.pages.length > 8 ? ` <span class="muted">+${v.pages.length - 8}</span>` : ""}</td></tr>`)
+            .join("")}</tbody></table></div>`
+        : `<div class="empty"><h2>Henüz ziyaret yok</h2><p>Sayaç yeni kuruldu; site ziyaret edildikçe veriler burada görünür.</p></div>`
+    }</section>
+<p class="small muted">Çerez kullanılmaz, IP adresi saklanmaz. Botlar (${nf(s.skipped.bot)}) ve senin cihazından yapılan ziyaretler (${nf(s.skipped.admin)}) sayılmaz. Ziyaret: aynı kişinin 30 dakika içindeki gezintisi.</p>`,
+  );
+}
+
+async function ozetView(env: Env) {
+  const s = await ziyaretStats(env.DB, 7);
+  const since = (d: number) => new Date(Date.now() - d * 864e5).toISOString();
+  const cnt = async (q: string, ...a: unknown[]) => (await env.DB.prepare(q).bind(...a).first<{ n: number }>())?.n ?? 0;
+  const t1 = await cnt("SELECT COUNT(*) AS n FROM talepler WHERE created_at > ?", since(1));
+  const t7 = await cnt("SELECT COUNT(*) AS n FROM talepler WHERE created_at > ?", since(7));
+  const t30 = await cnt("SELECT COUNT(*) AS n FROM talepler WHERE created_at > ?", since(30));
+  const yeni = await cnt("SELECT COUNT(*) AS n FROM talepler WHERE durum = ?", STATUSES[0].key);
+  const kat = (await env.DB.prepare("SELECT kategori_ad AS k, COUNT(*) AS n FROM talepler WHERE created_at > ? GROUP BY kategori_ad ORDER BY n DESC").bind(since(30)).all<{ k: string; n: number }>()).results;
+  const son = (await env.DB.prepare("SELECT id, ref, created_at, hizmet_ad, ad, durum, butce_tur, butce, butce_dusuk FROM talepler ORDER BY created_at DESC LIMIT 6").all<Row>()).results;
+  const butce = (await env.DB.prepare("SELECT COUNT(*) AS n, AVG(butce) AS ort, SUM(butce) AS top FROM talepler WHERE butce > 0 AND created_at > ?").bind(since(30)).first<{ n: number; ort: number; top: number }>()) || { n: 0, ort: 0, top: 0 };
+  return layout(
+    "Özet",
+    `<div class="adm-head"><h1>Özet</h1><a class="btn btn-primary btn-sm" href="/admin">Taleplere git</a></div>
+<div class="kpis"><div><span class="kpi-n">${nf(yeni)}</span><span class="kpi-l">Cevap bekleyen talep</span></div><div><span class="kpi-n">${nf(t1)}</span><span class="kpi-l">Son 24 saatte talep</span></div><div><span class="kpi-n">${nf(t7)}</span><span class="kpi-l">Son 7 günde talep</span></div><div><span class="kpi-n">${nf(t30)}</span><span class="kpi-l">Son 30 günde talep</span></div></div>
+<div class="kpis kpis-sm"><div><span class="kpi-n">${nf(s.today)}</span><span class="kpi-l">Bugün ziyaretçi</span></div><div><span class="kpi-n">${nf(s.visitors)}</span><span class="kpi-l">7 günde ziyaretçi</span></div><div><span class="kpi-n">${nf(s.views)}</span><span class="kpi-l">7 günde sayfa görüntüleme</span></div><div><span class="kpi-n">${butce.n ? tl(Math.round(butce.ort)) : "—"}</span><span class="kpi-l">Ortalama bütçe (30 gün)</span></div></div>
+<section class="panel"><div class="adm-head" style="margin-bottom:8px"><h2 class="h-sm" style="margin:0">Son 7 gün ziyaretçi</h2><a class="small" href="/admin/ziyaretciler">Ayrıntılar</a></div>${dailyChart(s.daily, 7)}</section>
+<div class="grid-2"><section class="panel"><div class="adm-head" style="margin-bottom:8px"><h2 class="h-sm" style="margin:0">Son talepler</h2><a class="small" href="/admin">Tümü</a></div>${
+      son.length
+        ? `<ul class="olist">${son.map((r) => `<li><a href="/admin/talep/${r.id}"><strong>${h(r.hizmet_ad)}</strong><span class="muted small">${h(r.ref)} · ${h(r.ad || "")} · ${fmtDT(r.created_at)}</span></a>${badge(r.durum)}</li>`).join("")}</ul>`
+        : `<p class="muted small">Henüz talep yok.</p>`
+    }</section>
+<section class="panel"><h2 class="h-sm">Kategoriye göre talep (30 gün)</h2>${barList(kat.map((x) => [x.k || "—", x.n] as [string, number]), t30)}<h2 class="h-sm" style="margin-top:20px">Ziyaretçi kaynağı (7 gün)</h2>${barList(s.sources.slice(0, 5), s.visits)}</section></div>`,
+  );
+}
+
 // ------------------------------------------------------------------ yönlendirme
 async function admin(req: Request, env: Env, url: URL): Promise<Response> {
   const p = url.pathname.replace(/\/+$/, "") || "/admin";
@@ -895,11 +973,14 @@ async function admin(req: Request, env: Env, url: URL): Promise<Response> {
     const pw = String(fd.get("password") || "");
     const ok = safeEq(await hmac("cmp", pw), await hmac("cmp", env.ADMIN_PASSWORD));
     if (!ok) return html(loginView("Şifre hatalı."), 401);
-    return redirect("/admin", { "Set-Cookie": await sessionCookie(env) });
+    return redirect("/admin/ozet", { "Set-Cookie": await sessionCookie(env) });
   }
   if (!(await isAuthed(req, env))) return html(loginView(), 401);
 
   if (p === "/admin/cikis" && req.method === "POST") return redirect("/admin", { "Set-Cookie": `${COOKIE}=; Path=/admin; HttpOnly; Secure; SameSite=Strict; Max-Age=0` });
+  await markAdmin(req, env.DB);
+  if (p === "/admin/ozet") return html(await ozetView(env));
+  if (p === "/admin/ziyaretciler") return html(await ziyaretView(env, url));
   if (p === "/admin" || p === "/admin/giris") return html(await listView(env, url));
   if (p === "/admin/talepler.csv") return csv(env);
   if (p === "/admin/blog") return html(await blogAdminList(env, clean(url.searchParams.get("ok"), 80)));
@@ -1144,6 +1225,10 @@ export default {
     const url = new URL(req.url);
     try {
       if (url.pathname === "/api/talep" && req.method === "POST") return await createTalep(req, env, url);
+      if (url.pathname === "/api/ziyaret" && req.method === "POST") {
+        try { await recordHit(req, env.DB); } catch (e) { console.error("ziyaret", (e as Error).message); }
+        return new Response(null, { status: 204 });
+      }
       if (url.pathname === "/api/isler" && req.method === "GET") return await apiIsler(env);
       const ig = url.pathname.match(/^\/api\/isler\/(\d+)$/);
       if (ig && req.method === "GET") return await apiIsGorsel(env, Number(ig[1]));
