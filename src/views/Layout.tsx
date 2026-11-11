@@ -77,7 +77,9 @@ export function Layout({ meta, s, cats, children, scripts = [], bodyClass }: Lay
         <meta property="og:image" content={og} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="theme-color" content="#FFFFFF" />
+        <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="preload" href="/assets/fonts/InstrumentSans.woff" as="font" type="font/woff" crossOrigin="" />
         <link rel="preload" href="/assets/fonts/Geist.woff" as="font" type="font/woff" crossOrigin="" />
