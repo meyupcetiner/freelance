@@ -975,3 +975,40 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
 .pf-hero-side { grid-template-columns: minmax(0, 560px) auto; align-items: center; justify-content: space-between; gap: 24px; padding: 0; }
 @media (max-width: 760px) { .pf-hero-side { grid-template-columns: 1fr; } }
 .hero2-h { letter-spacing: -0.035em; }
+
+/* ---- Görselsiz düzen: ana sayfa alan paneli, alan sayfası hizmet listesi (2026-11) */
+.alan-panel { background: #fff; border: 1px solid var(--line, #e7e7e2); border-radius: 22px; padding: clamp(20px, 2.4vw, 32px); box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 18px 40px -24px rgba(0,0,0,.18); }
+.ap-head { margin: 0 0 14px; font-size: .82rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted, #6b6b66); }
+.alan-panel ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.alan-panel a { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 16px 18px; border-radius: 16px; background: var(--paper); color: inherit; text-decoration: none; transition: background .15s ease, transform .15s ease; }
+.alan-panel a:hover { background: #ecece7; transform: translateX(2px); }
+.ap-ico { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 13px; background: var(--sky); color: var(--ink); }
+.ap-txt { display: grid; gap: 2px; min-width: 0; }
+.ap-txt strong { font-family: var(--display); font-size: 1.12rem; font-weight: 650; letter-spacing: -.01em; }
+.ap-txt small { color: var(--muted, #6b6b66); font-size: .92rem; }
+.ap-ok { font-size: 1.2rem; color: var(--muted, #6b6b66); }
+
+.hub-svc .sec-head p { max-width: 460px; }
+.hub-group + .hub-group { margin-top: 34px; }
+.hub-group-h { font-family: var(--display); font-size: 1.05rem; font-weight: 650; margin: 0 0 12px; color: var(--muted, #6b6b66); letter-spacing: 0; }
+.hub-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line, #e7e7e2); }
+.hub-list li { border-bottom: 1px solid var(--line, #e7e7e2); }
+.hub-list a { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 16px 18px 0; color: inherit; text-decoration: none; font-weight: 500; }
+.hub-list a:hover { color: var(--brand-2); }
+.hub-list a:hover .hl-ok { transform: translateX(3px); color: inherit; }
+.hl-ok { color: var(--muted, #6b6b66); transition: transform .15s ease; }
+@media (max-width: 900px) { .hub-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .hub-list { grid-template-columns: 1fr; } }
+
+.hub-2col { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 72px); }
+@media (max-width: 760px) { .hub-2col { grid-template-columns: 1fr; } }
+.hub-check { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 12px; }
+.hub-check li { display: flex; gap: 10px; align-items: flex-start; font-size: 1.05rem; }
+.hub-check li svg { flex: none; margin-top: 3px; }
+.hub-price { margin: 16px 0 14px; display: grid; gap: 0; }
+.hub-price > div { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line, #e7e7e2); }
+.hub-price dt { font-weight: 500; }
+.hub-price dd { margin: 0; font-family: var(--display); font-weight: 650; white-space: nowrap; }
+@media (max-width: 480px) { .hub-price > div { flex-direction: column; gap: 2px; } }
+
+.pf-sec:has(.pf-grid:empty) { display: none; }

@@ -4,7 +4,9 @@ import { tl, tierRange } from "../../lib/pricing";
 import { generalFaq } from "../../data/general-faq";
 import { Breadcrumbs, CtaBand, FaqList } from "../components/ui";
 import { Icon } from "../components/icons";
-import { Ph, HERO_PH, PORTFOLIO_PH, CatImg } from "../components/placeholders";
+import { CatImg } from "../components/placeholders";
+import { SegIcon } from "../Layout";
+import { HUBS } from "../../data/hubs";
 import { CATEGORIES, SERVICES, servicesOf, categoryBySlug } from "../../data/catalog";
 import type { Hub } from "../../data/hubs";
 import { safeJson } from "../../lib/seo";
@@ -64,30 +66,23 @@ export function Home({ s, services }: { s: Settings; cats: Category[]; services:
               <li>Her talebi uzman ekip okur</li>
             </ul>
           </div>
-          <div className="collage" aria-label="İş örnekleri">
-            <figure className="cl cl-photo">
-              <Ph {...HERO_PH.photo} />
-              <figcaption className="cl-tag">Fotoğraf</figcaption>
-            </figure>
-            <figure className="cl cl-poster">
-              <Ph {...HERO_PH.poster} />
-              <figcaption className="cl-tag">Grafik tasarım</figcaption>
-            </figure>
-            <figure className="cl cl-web">
-              <Ph {...HERO_PH.web} />
-              <figcaption className="cl-tag">Web arayüzü</figcaption>
-            </figure>
-            <figure className="cl cl-video" aria-hidden="true">
-              <Ph {...HERO_PH.video} />
-            </figure>
-            <div className="cl-chip" aria-hidden="true">
-              <span className="status-dot" />
-              <span>
-                <strong>Yeni talep</strong>
-                <span className="block">Ürün fotoğrafçılığı, 25 ürün</span>
-              </span>
-            </div>
-          </div>
+          <nav className="alan-panel" aria-label="Hizmet alanları">
+            <p className="ap-head">Üç alan, tek talep formu</p>
+            <ul>
+              {HUBS.map((h) => (
+                <li key={h.key}>
+                  <a href={h.path}>
+                    <span className="ap-ico"><SegIcon k={h.key} size={22} /></span>
+                    <span className="ap-txt">
+                      <strong>{h.ad}</strong>
+                      <small>{h.alt}</small>
+                    </span>
+                    <span className="ap-ok" aria-hidden="true">→</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
       </section>
 
@@ -144,34 +139,6 @@ export function Home({ s, services }: { s: Settings; cats: Category[]; services:
             <a className="btn btn-primary" href="/talep-olustur">İlk adımı at</a>
             <a className="text-link" href="/nasil-calisir">Sürecin ayrıntıları</a>
           </div>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------------- ÖRNEK İŞLER */}
-      <section className="section bg-gray" id="ornek-isler" aria-labelledby="h-isler">
-        <div className="wrap">
-          <header className="sec-head">
-            <div>
-              <span className="tag">Örnek işler</span>
-              <h2 id="h-isler" className="h-xl">Fotoğraftan arayüze.</h2>
-            </div>
-            <p id="isler-not">
-              Seçilmiş işler bu alanda yayımlanacak.
-            </p>
-          </header>
-          <ul className="works2" id="isler">
-            {PORTFOLIO_PH.map((w, i) => (
-              <li key={i} className={`w w-${i + 1}`} data-slot={i}>
-                <figure className="w-fig">
-                  <span className="w-media"><Ph n={w.n} text={w.baslik} ratio={w.ratio} /></span>
-                  <figcaption className="w-cap">
-                    <span className="w-kat">{w.kategori}</span>
-                    <span className="w-title">{w.baslik}</span>
-                  </figcaption>
-                </figure>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
@@ -302,12 +269,11 @@ export function HowSteps() {
   );
 }
 
-// ------------------------------------------------------------------ ALAN SAYFALARI (Stüdyo / Tasarım / Dijital): portfolyo
-// Izgara Worker tarafından Admin → Örnek işler'deki görsellerle doldurulur; iş yoksa yer tutucular görünür.
-const PF_SHAPES = ["r-45", "r-11", "r-32", "r-34", "r-169", "r-45", "r-11", "r-34", "r-32"];
+// ------------------------------------------------------------------ ALAN SAYFALARI (Stüdyo / Tasarım / Dijital)
+// Hizmet listesi + kimler için + rehber fiyatlar. Admin → Örnek işler'de iş varsa Worker ızgarayı doldurur; boşken bölüm gizlenir.
 export function HubPage({ hub }: { hub: Hub; posts?: { href: string; baslik: string }[] }) {
   const first = hub.kategoriler[0];
-  const ph = PF_SHAPES.map((r, i) => `<figure class="pf-item pf-ph ${r}"><span>${String(i + 1).padStart(2, "0")}</span></figure>`).join("");
+  const groups = hub.kategoriler.map((k) => ({ cat: categoryBySlug(k), items: SERVICES.filter((x) => x.category === k) })).filter((g) => g.items.length);
   return (
     <>
       <section className="pf-hero">
@@ -323,19 +289,73 @@ export function HubPage({ hub }: { hub: Hub; posts?: { href: string; baslik: str
         </div>
       </section>
 
-      <section className="pf-sec" aria-label={`${hub.ad} işleri`}>
+      <section className="section hub-svc" aria-labelledby="h-hub-svc">
         <div className="wrap">
-          <div className="pf-grid" data-alan={hub.key} dangerouslySetInnerHTML={{ __html: `<!--ISLER:${hub.key}-->${ph}<!--/ISLER-->` }} />
+          <header className="sec-head">
+            <div>
+              <span className="tag">Hizmetler</span>
+              <h2 id="h-hub-svc" className="h-xl">Neler yapıyoruz?</h2>
+            </div>
+            <p>{hub.lead}</p>
+          </header>
+          {groups.map((g) => (
+            <div className="hub-group" key={g.cat?.slug || g.items[0].category}>
+              {groups.length > 1 && g.cat ? <h3 className="hub-group-h">{g.cat.name}</h3> : null}
+              <ul className="hub-list">
+                {g.items.map((x) => (
+                  <li key={x.slug}>
+                    <a href={x.page ? `/hizmetler/${x.page}` : `/talep-olustur?kategori=${x.category}&hizmet=${x.slug}`}>
+                      <span>{x.name}</span>
+                      <span className="hl-ok" aria-hidden="true">→</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </section>
 
-      <CtaBand title="Sıradaki iş seninki olsun." text="Kapsamı yaz, yazılı teklifle dönüş yapalım." label="Talep oluştur" href={`/talep-olustur?kategori=${first}`} />
+      <section className="section bg-gray hub-info" aria-label="Kimler için ve rehber fiyatlar">
+        <div className="wrap hub-2col">
+          <div>
+            <span className="tag">Kimler için</span>
+            <ul className="hub-check">
+              {hub.kimler.map((k) => (
+                <li key={k}><Icon name="ok" size={18} />{k}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <span className="tag">Rehber fiyatlar</span>
+            <dl className="hub-price">
+              {hub.fiyat.map((f) => {
+                const i = f.indexOf(": ");
+                return (
+                  <div key={f}>
+                    <dt>{i > 0 ? f.slice(0, i) : f}</dt>
+                    <dd>{i > 0 ? f.slice(i + 2) : ""}</dd>
+                  </div>
+                );
+              })}
+            </dl>
+            <p className="small muted">Kesin fiyat kapsam netleşince yazılı verilir. <a className="text-link" href="/fiyat-rehberi">Fiyat rehberi</a></p>
+          </div>
+        </div>
+      </section>
+
+      <section className="pf-sec" aria-label={`${hub.ad} işleri`}>
+        <div className="wrap">
+          <div className="pf-grid" data-alan={hub.key} dangerouslySetInnerHTML={{ __html: `<!--ISLER:${hub.key}--><!--/ISLER-->` }} />
+        </div>
+      </section>
+
+      <CtaBand title="Projeni anlat, teklifini al." text="Kapsamı yaz, yazılı teklifle dönüş yapalım." label="Talep oluştur" href={`/talep-olustur?kategori=${first}`} />
 
       <section className="section section-tight pf-faq" aria-labelledby="h-hub-sss">
         <div className="wrap narrow">
           <h2 id="h-hub-sss" className="h-sm">Sık sorulanlar</h2>
           <FaqList items={hub.sss} />
-          <p className="small muted">Rehber fiyatlar: {hub.fiyat.join(" · ")}. <a href="/fiyat-rehberi">Fiyat rehberi</a></p>
         </div>
       </section>
     </>

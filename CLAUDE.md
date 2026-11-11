@@ -14,6 +14,7 @@ Canlı: https://getbrif.com — Cloudflare Workers + D1.
 - Hedef: bütçesi olan müşteri ("parası olan müşteri"), kalitesiz müşteri değil.
 - **Ekip sitede gösterilmez.** Profiller (`src/data/profiles.ts`, 7 gerçek kişi, soyadı baş harf) sadece admin'de.
 - Sahte iş, sahte yorum, sahte portfolyo, sahte istatistik YOK.
+- **Referans/yer tutucu görsel kutusu yok.** Site görselsiz, sade, kurumsal; Eyüp portfolyo görseli vermeyecek.
 - Marka sesi: profesyonel ve kreatif ("kreatif insanların sitesi"). "Kurucu her talebi okuyor", "yeni platform" gibi ifadeler kullanılmaz. Motto: "Fikrini anlat, gerisini yaratıcılara bırak."
 - Siteyi uzun metinle boğma; uzun metin sadece SEO'ya hizmet ediyorsa (hizmet sayfaları, blog).
 - Başlıklar gereksiz yere alt satıra taşmasın (masaüstünde hub başlıkları tek satır).
@@ -23,7 +24,7 @@ Canlı: https://getbrif.com — Cloudflare Workers + D1.
 - Sosyal medya **Dijital** kategorisinde. WhatsApp numarası sitede yok.
 
 ## Site yapısı
-- Üç "hub" (`src/data/hubs.ts`): `/` Brif Stüdyo (foto/video), `/tasarim` Brif Tasarım (grafik+içerik), `/dijital` Brif Dijital (web, reklam, sosyal). Hub sayfaları portfolyo sayfası: başlık + "Talep oluştur" + iş ızgarası (`<!--ISLER:key-->` işaretini worker `isler` tablosundan doldurur).
+- Üç "hub" (`src/data/hubs.ts`): `/` Brif Stüdyo (foto/video), `/tasarim` Brif Tasarım (grafik+içerik), `/dijital` Brif Dijital (web, reklam, sosyal). Hub sayfaları: başlık + "Talep oluştur" + kategoriye göre hizmet listesi + kimler için/rehber fiyatlar + SSS. Admin'de örnek iş varsa `<!--ISLER:key-->` ızgarası dolar, yoksa gizli.
 - `/ana-sayfa` eski ana sayfa, `/hizmetler` kategori kutuları, `/talep-olustur` çok adımlı form, `/blog` (worker D1'den render eder), `/fiyat-rehberi`, yasal sayfalar.
 - Admin: `/admin` (şifre: Cloudflare secret `ADMIN_PASSWORD`). Talepler, notlar, profiller, örnek işler (portfolyo), blog, medya, görsel düzenleyici (`/admin/duzenleyici`).
 - `ayarlar.js` ve `fiyatlar.js` kökte; Eyüp elle düzenleyebilir, export bunları `site/`'a kopyalar.
@@ -58,4 +59,3 @@ Test araçları (`tools/`, Playwright gerekir: `npm i -D playwright && npx playw
 ## Yapılacaklar (Eyüp'e hatırlatılacak)
 - Search Console + Bing Webmaster'a siteyi ekle, sitemap gönder; Google İşletme Profili.
 - Haftalık blog yazısı. Fiyat rehberindeki düşük alt sınırları yükselt.
-- Admin → Örnek işler'den portfolyo görselleri; ana sayfadaki G01–G04, G11–G16 yer tutucularına görsel.

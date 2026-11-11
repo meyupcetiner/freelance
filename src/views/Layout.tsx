@@ -27,10 +27,10 @@ export function Logo({ s }: { s: Settings }) {
 }
 
 /** Üst menü sekme ikonları (Lucide çizgi stili, ISC lisansı) */
-function SegIcon({ k }: { k: string }) {
+export function SegIcon({ k, size = 18 }: { k: string; size?: number }) {
   const p = { fill: "none", stroke: "currentColor", strokeWidth: 1.9, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
       {k === "studyo" ? (
         <g {...p}><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z" /><circle cx="12" cy="13" r="3" /></g>
       ) : k === "tasarim" ? (
