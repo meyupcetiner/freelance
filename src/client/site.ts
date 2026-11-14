@@ -133,6 +133,9 @@ const ALLOWED = new Set(["page_view", "form_start", "form_step", "form_submit", 
 function track(name: string, data: { service?: string; step?: number } = {}) {
   if (!ALLOWED.has(name)) return;
   gaEvent(name, data);
+  const zmap: Record<string, string> = { form_start: "form-basla", form_step: "form-adim", form_submit: "talep", budget_warning: "butce-dusuk" };
+  const zw = (window as any).__z;
+  if (zmap[name] && zw) zw(zmap[name], name === "form_step" ? String(data.step ?? "") : String(data.service || ""));
   if (cfg.static) return; // statik sürümde sunucu tarafı sayım yok
   const body = JSON.stringify({ name, path: location.pathname, service: data.service || "", step: data.step ?? null, source: sourceType() });
   try {
@@ -203,19 +206,53 @@ document.addEventListener("click", (e) => {
 
 
 // ------------------------------------------------------------------ ziyaret sayacı (çerezsiz; admin → Ziyaretçiler)
-try {
-  const u = new URL(location.href);
+// Sayfa görüntüleme + sayfadan çıkarken aktif süre/kaydırma + önemli tıklamalar ve form adımları.
+const Z = (() => {
+  if (location.pathname.startsWith("/admin")) return (_e: string, _ex?: string) => {};
+  const send = (o: Record<string, unknown>) => {
+    try {
+      const body = JSON.stringify(o);
+      if (!navigator.sendBeacon || !navigator.sendBeacon("/api/ziyaret", new Blob([body], { type: "application/json" })))
+        fetch("/api/ziyaret", { method: "POST", body, keepalive: true, headers: { "Content-Type": "application/json" } }).catch(() => {});
+    } catch { /* sayaç siteyi etkilemesin */ }
+  };
+  const pv = Math.random().toString(36).slice(2, 12);
   let first = false;
   try { first = !sessionStorage.getItem("brif_s"); sessionStorage.setItem("brif_s", "1"); } catch { first = true; }
-  const body = JSON.stringify({
-    p: location.pathname,
-    ti: document.title,
-    r: first ? document.referrer : "",
-    u: first ? (u.searchParams.get("utm_source") || "") : "",
-    f: first ? 1 : 0,
+  const u = new URL(location.href);
+  send({
+    p: location.pathname, ti: document.title, pv,
+    r: first ? document.referrer : "", u: first ? u.searchParams.get("utm_source") || "" : "", f: first ? 1 : 0,
     wd: (navigator as Navigator & { webdriver?: boolean }).webdriver ? 1 : 0,
   });
-  if (!navigator.sendBeacon || !navigator.sendBeacon("/api/ziyaret", new Blob([body], { type: "application/json" }))) {
-    fetch("/api/ziyaret", { method: "POST", body, keepalive: true, headers: { "Content-Type": "application/json" } }).catch(() => {});
-  }
-} catch { /* sayaç siteyi etkilemesin */ }
+  // aktif süre (sekme görünürken) ve en fazla kaydırma
+  let active = 0, since = document.visibilityState === "visible" ? Date.now() : 0, maxSc = 0;
+  const scroll = () => {
+    const h = document.documentElement.scrollHeight - innerHeight;
+    maxSc = Math.max(maxSc, h > 0 ? Math.round((scrollY / h) * 100) : 100);
+  };
+  addEventListener("scroll", scroll, { passive: true });
+  scroll();
+  const flush = () => {
+    if (since) { active += Date.now() - since; since = 0; }
+    send({ e: "sure", p: location.pathname, pv, d: Math.round(active / 1000), sc: maxSc });
+  };
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flush();
+    else since = Date.now();
+  });
+  addEventListener("pagehide", flush);
+  // önemli tıklamalar: butonlar, talep linkleri, hizmet listeleri, dış bağlantılar
+  document.addEventListener("click", (ev) => {
+    const a = (ev.target as HTMLElement).closest<HTMLAnchorElement | HTMLButtonElement>("a, button");
+    if (!a || a.closest("#consent, .adm")) return;
+    const href = a instanceof HTMLAnchorElement ? a.getAttribute("href") || "" : "";
+    const txt = (a.getAttribute("aria-label") || a.textContent || "").replace(/[→↗]/g, "").replace(/\s+/g, " ").trim().slice(0, 60);
+    const onemli = a.matches(".btn, .nav-cta, .header-cta, .hub-list a, .alan-panel a, .seg a, .svc-card, .tags a") || /^\/talep-olustur|^tel:|^mailto:|^https?:/.test(href);
+    if (!onemli || !txt) return;
+    const dis = /^https?:/.test(href) && !href.includes(location.host);
+    send({ e: "tik", p: location.pathname, ex: (dis ? "↗ " : "") + txt + (href && !href.startsWith("#") ? " → " + href.replace(/^https?:\/\/(www\.)?/, "").slice(0, 50) : "") });
+  }, true);
+  return (e: string, ex = "") => send({ e, p: location.pathname, ex });
+})();
+(window as any).__z = Z;

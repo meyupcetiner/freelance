@@ -1,6 +1,6 @@
 // Brif — Cloudflare Worker: talep API'si (D1'e kayıt) + yönetim paneli.
 // Statik sayfalar ASSETS üzerinden sunulur; yayınlanmış bir görsel tasarımı olan sayfalara Worker tasarımı uygular.
-import { recordHit, markAdmin, stats as ziyaretStats } from "./ziyaret";
+import { recordHit, markAdmin, stats as ziyaretStats, oturumDetay, olayAd, alanOf, type Oturum } from "./ziyaret";
 import { CATEGORIES, STATUSES, TIMINGS, PREFS, SERVICES, categoryBySlug } from "../data/catalog";
 import { answerRows, clean, FILE_RULES, validateTalep } from "../lib/talep";
 import type { Pricing } from "../lib/pricing";
@@ -907,30 +907,80 @@ const ago = (t: number) => {
   return m < 1 ? "şimdi" : m < 60 ? `${m} dk önce` : m < 1440 ? `${Math.round(m / 60)} sa önce` : new Date(t).toLocaleString("tr-TR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" });
 };
 
+const sureFmt = (sn: number) => (sn <= 0 ? "—" : sn < 60 ? `${sn} sn` : sn < 3600 ? `${Math.floor(sn / 60)} dk${sn % 60 ? " " + (sn % 60) + " sn" : ""}` : `${Math.floor(sn / 3600)} sa ${Math.round((sn % 3600) / 60)} dk`);
+const svcAd = (slug: string) => SERVICES.find((x) => x.slug === slug)?.name || slug;
+const exAd = (e: string, ex: string) => (e === "form-basla" || e === "talep" || e === "butce-dusuk" ? svcAd(ex) : ex);
+const ULKE: Record<string, string> = { TR: "Türkiye", US: "ABD", DE: "Almanya", GB: "İngiltere", NL: "Hollanda", FR: "Fransa", CA: "Kanada", IN: "Hindistan", AZ: "Azerbaycan", CY: "Kıbrıs", RU: "Rusya", SG: "Singapur", IE: "İrlanda", SE: "İsveç", BE: "Belçika", CH: "İsviçre", AT: "Avusturya", AE: "BAE", SA: "S. Arabistan", "?": "Bilinmiyor" };
+const yerAd = (o: Oturum) => (o.ulke && o.ulke !== "TR" ? `${o.city || ""}${o.city ? ", " : ""}${ULKE[o.ulke] || o.ulke}` : [o.il, o.city && o.city !== o.il ? o.city : ""].filter(Boolean).join(" · ") || "Bilinmiyor");
+const sonucRozet = (o: Oturum) => (o.sonuc === "talep" ? '<span class="badge tone-ok">Talep gönderdi</span>' : o.sonuc === "form" ? '<span class="badge tone-warn">Formu açtı</span>' : "");
+
 async function ziyaretView(env: Env, url: URL) {
   const days = [1, 7, 30, 90].includes(Number(url.searchParams.get("gun"))) ? Number(url.searchParams.get("gun")) : 7;
-  const s = await ziyaretStats(env.DB, days);
+  const tr = url.searchParams.get("tr") === "1";
+  const s = await ziyaretStats(env.DB, days, { tr });
   const talepN = (await env.DB.prepare("SELECT COUNT(*) AS n FROM talepler WHERE created_at > ?").bind(new Date(Date.now() - days * 864e5).toISOString()).first<{ n: number }>())?.n ?? 0;
   const conv = s.visitors ? ((talepN / s.visitors) * 100).toFixed(1).replace(".", ",") : "0";
-  const tabs = [1, 7, 30, 90].map((d) => `<a class="vtab${d === days ? " is-on" : ""}" href="?gun=${d}">${d === 1 ? "Bugün" : `Son ${d} gün`}</a>`).join("");
+  const q = (o: Record<string, string>) => "?" + new URLSearchParams({ gun: String(days), ...(tr ? { tr: "1" } : {}), ...o }).toString();
+  const tabs = [1, 7, 30, 90].map((d) => `<a class="vtab${d === days ? " is-on" : ""}" href="${q({ gun: String(d) })}">${d === 1 ? "Bugün" : `Son ${d} gün`}</a>`).join("");
+  const trLink = `<a class="vtab${tr ? " is-on" : ""}" href="?${new URLSearchParams({ gun: String(days), ...(tr ? {} : { tr: "1" }) })}">${tr ? "✓ " : ""}Yalnız Türkiye</a>`;
   const pageLink = (p: string) => `<a href="${h(p)}" target="_blank" rel="noopener">${h(p)}</a>`;
+  const H = s.huni;
+  const huniRow = (l: string, n: number) => `<li><span class="vbar-k">${l}</span><span class="vbar-n">${nf(n)}${H.ziyaret ? ` <small class="muted">%${Math.round((n / H.ziyaret) * 100)}</small>` : ""}</span><span class="vbar-b" style="width:${Math.max(3, Math.round((n / Math.max(1, H.ziyaret)) * 100))}%"></span></li>`;
   return layout(
     "Ziyaretçiler",
-    `<div class="adm-head"><h1>Ziyaretçiler</h1><nav class="vtabs" aria-label="Zaman aralığı">${tabs}</nav></div>
-<div class="kpis"><div><span class="kpi-n">${nf(s.visitors)}</span><span class="kpi-l">Tekil ziyaretçi</span></div><div><span class="kpi-n">${nf(s.visits)}</span><span class="kpi-l">Ziyaret</span></div><div><span class="kpi-n">${nf(s.views)}</span><span class="kpi-l">Sayfa görüntüleme</span></div><div><span class="kpi-n">${nf(talepN)}</span><span class="kpi-l">Talep · %${conv} dönüşüm</span></div></div>
-<div class="kpis kpis-sm"><div><span class="kpi-n">${nf(s.today)}</span><span class="kpi-l">Bugün</span></div><div><span class="kpi-n">${s.visits ? (s.views / s.visits).toFixed(1).replace(".", ",") : "0"}</span><span class="kpi-l">Ziyaret başına sayfa</span></div><div><span class="kpi-n">%${s.bounce}</span><span class="kpi-l">Tek sayfada çıkan</span></div><div><span class="kpi-n">${nf(s.formStarts)}</span><span class="kpi-l">Talep formu açılışı</span></div></div>
+    `<div class="adm-head"><h1>Ziyaretçiler</h1><nav class="vtabs" aria-label="Zaman aralığı">${tabs}${trLink}</nav></div>
+<div class="kpis"><div><span class="kpi-n">${nf(s.visitors)}</span><span class="kpi-l">Tekil ziyaretçi</span></div><div><span class="kpi-n">${nf(s.visits)}</span><span class="kpi-l">Ziyaret</span></div><div><span class="kpi-n">${sureFmt(s.ortSure)}</span><span class="kpi-l">Ortalama ziyaret süresi</span></div><div><span class="kpi-n">${nf(talepN)}</span><span class="kpi-l">Talep · %${conv} dönüşüm</span></div></div>
+<div class="kpis kpis-sm"><div><span class="kpi-n">${nf(s.today)}</span><span class="kpi-l">Bugün</span></div><div><span class="kpi-n">${nf(s.views)}</span><span class="kpi-l">Sayfa görüntüleme</span></div><div><span class="kpi-n">${s.visits ? (s.views / s.visits).toFixed(1).replace(".", ",") : "0"}</span><span class="kpi-l">Ziyaret başına sayfa</span></div><div><span class="kpi-n">%${s.bounce}</span><span class="kpi-l">Tek sayfada çıkan</span></div></div>
 ${days > 1 ? `<section class="panel"><h2 class="h-sm">Günlük ziyaretçi</h2>${dailyChart(s.daily, days)}</section>` : ""}
 <div class="grid-2"><section class="panel"><h2 class="h-sm">Nereden geliyorlar?</h2>${barList(s.sources, s.visits)}</section>
-<section class="panel"><h2 class="h-sm">En çok bakılan sayfalar</h2>${s.pages.length ? `<ul class="vbar">${s.pages.map(([p, t, n]) => `<li><span class="vbar-k">${h(t)}<small>${pageLink(p)}</small></span><span class="vbar-n">${nf(n)}</span><span class="vbar-b" style="width:${Math.max(3, Math.round((n / Math.max(1, s.pages[0][2])) * 100))}%"></span></li>`).join("")}</ul>` : `<p class="muted small">Henüz veri yok.</p>`}</section></div>
-<div class="grid-2"><section class="panel"><h2 class="h-sm">Şehir</h2>${barList(s.cities, s.visits)}</section><section class="panel"><h2 class="h-sm">Cihaz</h2>${barList(s.devices, s.visits)}</section></div>
-<section class="panel"><h2 class="h-sm">Son ziyaretler</h2>${
-      s.recent.length
-        ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Zaman</th><th>Kaynak</th><th>Şehir · cihaz</th><th>Gezdiği sayfalar</th></tr></thead><tbody>${s.recent
-            .map((v) => `<tr><td class="nowrap">${ago(v.start)}</td><td>${h(v.src)}</td><td>${h(v.city || "Bilinmiyor")} · ${h(v.dev)}</td><td class="vpath">${v.pages.slice(0, 8).map((x) => `<span title="${h(x.ti)}">${h(x.p)}</span>`).join(" → ")}${v.pages.length > 8 ? ` <span class="muted">+${v.pages.length - 8}</span>` : ""}</td></tr>`)
-            .join("")}</tbody></table></div>`
-        : `<div class="empty"><h2>Henüz ziyaret yok</h2><p>Sayaç yeni kuruldu; site ziyaret edildikçe veriler burada görünür.</p></div>`
+<section class="panel"><h2 class="h-sm">Hangi ilden?</h2>${barList(s.iller, s.visits)}${!tr && s.ulkeler.some(([k]) => k !== "TR" && k !== "?") ? `<h3 class="h-xs vsub">Ülke</h3>${barList(s.ulkeler.map(([k, n]) => [ULKE[k] || k, n] as [string, number]), s.visits)}` : ""}</section></div>
+<div class="grid-2"><section class="panel"><h2 class="h-sm">Neyle ilgileniyorlar?</h2>${barList(s.alanlar, s.visits)}${s.formHizmet.length ? `<h3 class="h-xs vsub">Formda seçilen hizmet</h3>${barList(s.formHizmet.map(([k, n]) => [svcAd(k), n] as [string, number]), s.formHizmet[0][1])}` : ""}</section>
+<section class="panel"><h2 class="h-sm">Talebe giden yol</h2><ul class="vbar">${huniRow("Siteye giren", H.ziyaret)}${huniRow("Talep formunu açan", H.form)}${huniRow("Formu doldurmaya başlayan", H.basla)}${huniRow("3. adıma gelen", H.adim3)}${huniRow("Talep gönderen", H.talep)}</ul></section></div>
+<section class="panel"><h2 class="h-sm">Sayfalar <span class="muted small">görüntüleme · ortalama süre</span></h2>${
+      s.pages.length
+        ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Sayfa</th><th>Görüntüleme</th><th>Ort. süre</th></tr></thead><tbody>${s.pages.map((x) => `<tr><td><strong>${h(x.ti)}</strong><span class="block small muted">${pageLink(x.p)}</span></td><td>${nf(x.n)}</td><td>${sureFmt(x.ort)}</td></tr>`).join("")}</tbody></table></div>`
+        : `<p class="muted small">Henüz veri yok.</p>`
     }</section>
-<p class="small muted">Çerez kullanılmaz, IP adresi saklanmaz. Botlar (${nf(s.skipped.bot)}) ve senin cihazından yapılan ziyaretler (${nf(s.skipped.admin)}) sayılmaz. Ziyaret: aynı kişinin 30 dakika içindeki gezintisi.</p>`,
+<div class="grid-2"><section class="panel"><h2 class="h-sm">En çok tıklananlar</h2>${barList(s.tiklar, s.tiklar[0]?.[1] || 1)}</section><section class="panel"><h2 class="h-sm">Cihaz</h2>${barList(s.devices, s.visits)}</section></div>
+<section class="panel"><h2 class="h-sm">Son ziyaretler <span class="muted small">ayrıntı için satıra tıkla</span></h2>${
+      s.recent.length
+        ? `<div class="tbl-wrap"><table class="tbl vtbl"><thead><tr><th>Zaman</th><th>Kaynak</th><th>Konum · cihaz</th><th>İlgi</th><th>Süre</th><th>Gezdiği sayfalar</th></tr></thead><tbody>${s.recent
+            .map((o) => {
+              const link = `/admin/ziyaretciler/ziyaret?v=${o.vid}&t=${o.start}`;
+              return `<tr><td class="nowrap"><a class="vrow" href="${link}">${ago(o.start)}</a></td><td>${h(o.src)}</td><td>${h(yerAd(o))}<span class="block small muted">${h(o.dev)}</span></td><td>${h(o.alan || "—")} ${sonucRozet(o)}</td><td class="nowrap">${sureFmt(o.sure)}</td><td class="vpath">${o.pages.slice(0, 6).map((x) => `<span title="${h(x.ti)}">${h(x.p)}</span>`).join(" → ")}${o.pages.length > 6 ? ` <span class="muted">+${o.pages.length - 6}</span>` : ""}</td></tr>`;
+            })
+            .join("")}</tbody></table></div>`
+        : `<div class="empty"><h2>Henüz ziyaret yok</h2><p>Site ziyaret edildikçe veriler burada görünür.</p></div>`
+    }</section>
+<p class="small muted">Çerez kullanılmaz, IP adresi saklanmaz. Sayılmayanlar: botlar ve sunucu kaynaklı trafik (${nf(s.skipped.bot)}), senin cihazın (${nf(s.skipped.admin)})${tr ? `, yurt dışı (${nf(s.skipped.yabanci)})` : ""}. Süre: sekmenin açık ve önde olduğu süre. Ziyaret: aynı kişinin 30 dakika içindeki gezintisi.</p>`,
+  );
+}
+
+async function ziyaretDetayView(env: Env, url: URL) {
+  const vid = (url.searchParams.get("v") || "").replace(/[^a-f0-9]/g, "").slice(0, 24);
+  const t = Number(url.searchParams.get("t")) || 0;
+  const { o, digerleri } = await oturumDetay(env.DB, vid, t);
+  if (!o) return layout("Ziyaret", `<p class="small"><a href="/admin/ziyaretciler">← Ziyaretçiler</a></p><div class="empty"><h2>Ziyaret bulunamadı</h2></div>`);
+  const zaman = (x: number) => new Date(x).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Europe/Istanbul" });
+  const items = [...o.pages.map((p) => ({ ...p, k: "p" as const })), ...o.ev.map((e) => ({ ...e, k: "e" as const }))].sort((a, b) => a.t - b.t);
+  const gun = new Date(o.start).toLocaleString("tr-TR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" });
+  const ilgi: Record<string, number> = {};
+  for (const p of o.pages) { const a = alanOf(p.p); if (a) ilgi[a] = (ilgi[a] || 0) + Math.max(p.d, 1); }
+  return layout(
+    "Ziyaret ayrıntısı",
+    `<p class="small"><a href="/admin/ziyaretciler">← Ziyaretçiler</a></p>
+<div class="adm-head"><h1>Ziyaret · ${h(gun)}</h1>${sonucRozet(o)}</div>
+<div class="kpis"><div><span class="kpi-n vk">${h(o.src)}</span><span class="kpi-l">Nereden geldi</span></div><div><span class="kpi-n vk">${h(yerAd(o))}</span><span class="kpi-l">Konum</span></div><div><span class="kpi-n vk">${sureFmt(o.sure)}</span><span class="kpi-l">Sitede geçirdiği süre</span></div><div><span class="kpi-n vk">${o.pages.length} sayfa</span><span class="kpi-l">${h(o.dev)}</span></div></div>
+<div class="grid-2"><section class="panel"><h2 class="h-sm">Ziyaret akışı</h2><ol class="vtl">${items
+      .map((x) =>
+        x.k === "p"
+          ? `<li class="vtl-p"><span class="vtl-t">${zaman(x.t)}</span><div><strong>${h(x.ti || x.p)}</strong><span class="block small muted"><a href="${h(x.p)}" target="_blank" rel="noopener">${h(x.p)}</a> · ${x.d ? sureFmt(x.d) + " baktı" : "süre ölçülemedi"}${x.sc ? ` · sayfanın %${x.sc}'ini gördü` : ""}</span></div></li>`
+          : `<li class="vtl-e${x.e === "talep" ? " is-ok" : ""}"><span class="vtl-t">${zaman(x.t)}</span><div>${h(olayAd(x.e || "", exAd(x.e || "", x.ex || "")))}</div></li>`,
+      )
+      .join("")}</ol></section>
+<section class="panel"><h2 class="h-sm">İlgi alanı</h2>${barList(Object.entries(ilgi).sort((a, b) => b[1] - a[1]).map(([k, n]) => [k, n] as [string, number]), Math.max(1, ...Object.values(ilgi)), h).replace(/<span class="vbar-n">(\d+)<\/span>/g, (_m, n) => `<span class="vbar-n">${sureFmt(Number(n))}</span>`)}
+${digerleri.length ? `<h3 class="h-xs vsub">Aynı gün diğer ziyaretleri</h3><ul class="olist">${digerleri.map((d) => `<li><a href="/admin/ziyaretciler/ziyaret?v=${d.vid}&t=${d.start}"><strong>${zaman(d.start)} · ${h(d.src)}</strong><span class="muted small">${d.pages.length} sayfa · ${sureFmt(d.sure)}</span></a>${sonucRozet(d)}</li>`).join("")}</ul>` : ""}
+<p class="small muted" style="margin-top:16px">Aynı kişi ertesi gün gelirse yeni ziyaretçi olarak sayılır (kişisel veri tutulmadığı için).</p></section></div>`,
   );
 }
 
@@ -981,6 +1031,7 @@ async function admin(req: Request, env: Env, url: URL): Promise<Response> {
   await markAdmin(req, env.DB);
   if (p === "/admin/ozet") return html(await ozetView(env));
   if (p === "/admin/ziyaretciler") return html(await ziyaretView(env, url));
+  if (p === "/admin/ziyaretciler/ziyaret") return html(await ziyaretDetayView(env, url));
   if (p === "/admin" || p === "/admin/giris") return html(await listView(env, url));
   if (p === "/admin/talepler.csv") return csv(env);
   if (p === "/admin/blog") return html(await blogAdminList(env, clean(url.searchParams.get("ok"), 80)));
