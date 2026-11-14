@@ -1051,3 +1051,12 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
 .vtl-t { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 2px; }
 .vtbl tbody tr { position: relative; cursor: pointer; }
 .vrow::after { content: ""; position: absolute; inset: 0; }
+
+/* ---- Masaüstü ölçek: site her bilgisayar ekranında aynı oranda görünsün (1840px genişlikteki görünümün kopyası).
+   Telefon/tablet (<1100px) etkilenmez; admin paneli hariç. */
+@media (min-width: 1100px) { body:not(.adm) { zoom: .7; } }
+@media (min-width: 1366px) { body:not(.adm) { zoom: .74; } }
+@media (min-width: 1440px) { body:not(.adm) { zoom: .78; } }
+@media (min-width: 1536px) { body:not(.adm) { zoom: .83; } }
+@media (min-width: 1680px) { body:not(.adm) { zoom: .91; } }
+@media (min-width: 1840px) { body:not(.adm) { zoom: 1; } }
