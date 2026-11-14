@@ -1185,3 +1185,20 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
   .hero3-ill-r { right: auto; left: calc(50% + 390px); width: min(400px, calc(50% - 400px)); }
 }
 @media (max-width: 860px) { .hero3-ill-l { display: none; } }
+
+/* ---- Ana sayfa başlıkları ve üst menü yazıları %30 büyük (Eyüp, 2026-11) */
+.page-home .hero3-h { font-size: clamp(3rem, 6.5vw, 5.45rem); }
+.page-home .h-lg { font-size: clamp(2.3rem, 3.9vw, 3.1rem); }
+.page-home .cc-name, .page-home .steps3 h3 { font-size: 1.5rem; }
+.page-home .why h3 { font-size: 1.37rem; }
+@media (min-width: 861px) {
+  .page-home .hero3 .hero3-in { max-width: 900px; }
+  .page-home .hero3-ill-l { right: calc(50% + 470px); width: min(400px, calc(50% - 480px)); }
+  .page-home .hero3-ill-r { left: calc(50% + 470px); width: min(380px, calc(50% - 480px)); }
+}
+@media (min-width: 881px) {
+  .main-nav a { font-size: 1.26rem; }
+  .seg-i { font-size: 1.17rem; height: 42px; }
+  .seg-ico svg { width: 22px; height: 22px; }
+  .header-cta { font-size: 1.17rem; }
+}
