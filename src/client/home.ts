@@ -181,3 +181,20 @@ if (grid) {
     })
     .catch(() => {});
 }
+
+// ------------------------------------------------------------------ giriş: kaydırdıkça soldan sağa dolan yeşil zemin
+{
+  const hero = document.querySelector<HTMLElement>(".hero3");
+  if (hero) {
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let raf = 0;
+    const set = () => {
+      raf = 0;
+      const p = reduce ? 1 : Math.min(1, Math.max(0, scrollY / Math.max(1, hero.offsetHeight * 0.35)));
+      hero.style.setProperty("--fill", p.toFixed(3));
+    };
+    set();
+    addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(set); }, { passive: true });
+    addEventListener("resize", set);
+  }
+}
