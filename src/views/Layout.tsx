@@ -96,12 +96,11 @@ export function Layout({ meta, s, cats, children, scripts = [], bodyClass }: Lay
         </a>
         <header className="site-header">
           <div className="wrap header-row">
-            <a href="/" className="brand" aria-label={`${s.brand_name} ana sayfa`}>
+            <a href="/ana-sayfa" className="brand" aria-label={`${s.brand_name} ana sayfa`}>
               <Logo s={s} />
             </a>
             <nav aria-label="Ana menü" className="main-nav" id="ana-menu">
               <ul>
-                <li><a href="/ana-sayfa"{...(meta.path === "/ana-sayfa" ? { "aria-current": "page" as const } : {})}>Ana sayfa</a></li>
                 <li className="has-mega">
                   <a href="/hizmetler" className="mega-toggle" aria-haspopup="true">
                     Hizmetler
@@ -127,6 +126,8 @@ export function Layout({ meta, s, cats, children, scripts = [], bodyClass }: Lay
                     </div>
                   </div>
                 </li>
+                <li><a href="/nasil-calisir">Nasıl çalışır</a></li>
+                <li><a href="/fiyat-rehberi">Fiyatlar</a></li>
                 <li><a href="/blog">Blog</a></li>
                 <li className="nav-cta"><a href="/talep-olustur" className="btn btn-primary btn-block">Projen için talep oluştur</a></li>
               </ul>

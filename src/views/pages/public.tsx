@@ -4,9 +4,6 @@ import { tl, tierRange } from "../../lib/pricing";
 import { generalFaq } from "../../data/general-faq";
 import { Breadcrumbs, CtaBand, FaqList } from "../components/ui";
 import { Icon } from "../components/icons";
-import { CatImg } from "../components/placeholders";
-import { SegIcon } from "../Layout";
-import { HUBS } from "../../data/hubs";
 import { CATEGORIES, SERVICES, servicesOf, categoryBySlug } from "../../data/catalog";
 import type { Hub } from "../../data/hubs";
 import { safeJson } from "../../lib/seo";
@@ -34,52 +31,81 @@ export function calcData(services: Service[]) {
     });
 }
 
-export function Home({ s, services }: { s: Settings; cats: Category[]; services: Service[] }) {
-  const calc = calcData(services);
-  const first = calc[0];
-  const spans = ["t-7", "t-5", "t-5", "t-7", "t-6", "t-6"];
+// Kategori ikonları (Lucide, ince çizgi)
+const CAT_ICO: Record<string, string[]> = {
+  "fotograf-video": ["M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z", "c:12,13,3"],
+  "grafik-tasarim": ["m12 19 7-7 3 3-7 7-3-3z", "m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z", "m2 2 7.586 7.586", "c:11,11,2"],
+  "web-yazilim": ["M3 4h18a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z", "M8 21h8", "M12 17v4", "m9 9-2 1.5L9 12", "m15 9 2 1.5-2 1.5"],
+  "reklam-eticaret": ["m3 11 18-5v12L3 14v-3z", "M11.6 16.8a3 3 0 1 1-5.8-1.6"],
+  "sosyal-medya": ["c:18,5,3", "c:6,12,3", "c:18,19,3", "m8.59 13.51 6.83 3.98", "m15.41 6.51-6.82 3.98"],
+  "metin-icerik": ["M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z", "M14 2v4a2 2 0 0 0 2 2h4", "M10 9H8", "M16 13H8", "M16 17H8"],
+};
+export function CatIcon({ slug, size = 22 }: { slug: string; size?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {(CAT_ICO[slug] || CAT_ICO["metin-icerik"]).map((d, i) => {
+        if (d.startsWith("c:")) { const [cx, cy, r] = d.slice(2).split(","); return <circle key={i} cx={cx} cy={cy} r={r} />; }
+        return <path key={i} d={d} />;
+      })}
+    </svg>
+  );
+}
+
+/** Sade kategori kartları: ikon, ad, kısa açıklama, öne çıkan hizmetler, teklif linki */
+export function CatCards() {
+  return (
+    <ul className="cat-cards">
+      {CATEGORIES.map((c) => {
+        const subs = servicesOf(c.slug);
+        return (
+          <li key={c.slug} id={c.slug}>
+            <a className="cat-card" href={`/talep-olustur?kategori=${c.slug}`}>
+              <span className="cc-ico"><CatIcon slug={c.slug} /></span>
+              <span className="cc-name">{c.name}</span>
+              <span className="cc-short">{c.short}</span>
+              <span className="cc-subs">{subs.slice(0, 3).map((x) => x.name).join(" · ")}{subs.length > 3 ? ` +${subs.length - 3}` : ""}</span>
+              <span className="cc-go">Teklif al <span aria-hidden="true">→</span></span>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+const POPULER: [string, string][] = [
+  ["Ürün fotoğrafı", "/hizmetler/urun-fotografcisi"],
+  ["Tanıtım filmi", "/hizmetler/tanitim-videosu-cekimi"],
+  ["Logo & kurumsal kimlik", "/hizmetler/grafik-tasarim"],
+  ["Web sitesi", "/talep-olustur?kategori=web-yazilim"],
+  ["Meta reklam", "/hizmetler/meta-reklam-yonetimi"],
+  ["Sosyal medya yönetimi", "/hizmetler/sosyal-medya-yonetimi"],
+];
+
+export function Home(_: { s: Settings; cats: Category[]; services: Service[] }) {
   return (
     <>
-      {/* ---------------------------------------------------------------- HERO */}
-      <section className="hero2 bg-gray" aria-labelledby="hero-h">
-        <div className="wrap hero2-grid">
-          <div className="hero2-copy">
-            <ul className="tags" aria-label="Hizmet alanları">
-              <li><a href="/">Fotoğraf</a></li>
-              <li><a href="/tasarim">Tasarım</a></li>
-              <li><a href="/dijital">Web</a></li>
-              <li><a href="/dijital">Reklam</a></li>
-            </ul>
-            <h1 id="hero-h" className="hero2-h">
-              İhtiyacını anlat, <span className="h-line">doğru hizmete ulaş.</span>
-            </h1>
-            <p className="hero2-lead">
-              Ürün çekiminden web sitesine, logodan Meta reklamlarına kadar ihtiyacın olan işi birkaç adımda anlat. Talebini okuyup kapsamına ve bütçene uygun bir teklifle dönelim.
-            </p>
-            <div className="hero-actions">
-              <a href="/talep-olustur" className="btn btn-primary btn-lg">Projen için talep oluştur</a>
-              <a href="#hizmetler" className="btn btn-ghost btn-lg">Hizmetleri keşfet</a>
-            </div>
-            <ul className="hero-facts">
-              <li>Ücretsiz, üyelik yok</li>
-              <li>Yaklaşık 3 dakika</li>
-              <li>Her talebi uzman ekip okur</li>
-            </ul>
+      {/* ---------------------------------------------------------------- GİRİŞ */}
+      <section className="hero3" aria-labelledby="hero-h">
+        <div className="wrap hero3-in">
+          <h1 id="hero-h" className="hero3-h">
+            İhtiyacını anlat, <span className="h-line">doğru hizmete ulaş.</span>
+          </h1>
+          <p className="hero3-lead">Fotoğraf ve video, tasarım, web sitesi ve dijital reklam işlerin için kısa bir form doldur; kapsamına ve bütçene uygun yazılı teklif al.</p>
+          <div className="hero3-actions">
+            <a href="/talep-olustur" className="btn btn-primary btn-lg">Ücretsiz teklif al</a>
+            <a href="#hizmetler" className="btn btn-ghost btn-lg">Hizmetlere göz at</a>
           </div>
-          <nav className="alan-panel" aria-label="Hizmet alanları">
-            <p className="ap-head">Üç alan, tek talep formu</p>
+          <ul className="hero-facts hero3-facts">
+            <li>Ücretsiz, üyelik yok</li>
+            <li>Yaklaşık 3 dakika</li>
+            <li>Yazılı kapsam ve fiyat</li>
+          </ul>
+          <nav className="hero3-pop" aria-label="Popüler hizmetler">
+            <span>Popüler:</span>
             <ul>
-              {HUBS.map((h) => (
-                <li key={h.key}>
-                  <a href={h.path}>
-                    <span className="ap-ico"><SegIcon k={h.key} size={22} /></span>
-                    <span className="ap-txt">
-                      <strong>{h.ad}</strong>
-                      <small>{h.alt}</small>
-                    </span>
-                    <span className="ap-ok" aria-hidden="true">→</span>
-                  </a>
-                </li>
+              {POPULER.map(([t, href]) => (
+                <li key={href}><a href={href}>{t}</a></li>
               ))}
             </ul>
           </nav>
@@ -89,183 +115,131 @@ export function Home({ s, services }: { s: Settings; cats: Category[]; services:
       {/* ---------------------------------------------------------------- HİZMETLER */}
       <section className="section" id="hizmetler" aria-labelledby="h-hizmetler">
         <div className="wrap">
-          <header className="sec-head">
-            <div>
-              <span className="tag">Hizmetler</span>
-              <h2 id="h-hizmetler" className="h-xl">Altı alan, {SERVICES.length} hizmet.</h2>
-            </div>
-            <p>Kategoriyi seç, gerisini form sorar.</p>
+          <header className="sec-head2">
+            <h2 id="h-hizmetler" className="h-lg">Ne yaptırmak istiyorsun?</h2>
+            <p>Kategoriyi seç; form hizmete göre birkaç soru sorar.</p>
           </header>
-          <ul className="svc-bento">
-            {CATEGORIES.map((c, i) => {
-              const subs = servicesOf(c.slug);
-              return (
-                <li key={c.slug} className={spans[i]}>
-                  <a className="svc-tile" href={`/talep-olustur?kategori=${c.slug}`}>
-                    <span className="svc-art">
-                      <CatImg slug={c.slug} />
-                    </span>
-                    <span className="svc-meta">
-                      <span className="svc-n">{String(i + 1).padStart(2, "0")}</span>
-                      <span className="svc-txt">
-                        <span className="svc-title">{c.name}</span>
-                        <span className="svc-short">{c.short}</span>
-                      </span>
-                      <span className="svc-count">
-                        {subs.length} hizmet
-                        <Icon name="ok" size={18} />
-                      </span>
-                    </span>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+          <CatCards />
+          <p className="sec-more"><a className="text-link" href="/hizmetler">Tüm hizmetler ({SERVICES.length})</a></p>
         </div>
       </section>
 
       {/* ---------------------------------------------------------------- SÜREÇ */}
-      <section className="section bg-mint" id="nasil" aria-labelledby="h-nasil">
+      <section className="section bg-gray" id="nasil" aria-labelledby="h-nasil">
         <div className="wrap">
-          <header className="sec-head">
-            <div>
-              <span className="tag">Süreç</span>
-              <h2 id="h-nasil" className="h-xl">Talep oluşturmak 4 adım</h2>
-            </div>
-            <p>Her talebi uzman ekip okur.</p>
+          <header className="sec-head2">
+            <h2 id="h-nasil" className="h-lg">Nasıl çalışır?</h2>
+            <p>Üç adımda teklifini al.</p>
           </header>
           <HowSteps />
           <div className="steps-cta">
-            <a className="btn btn-primary" href="/talep-olustur">İlk adımı at</a>
+            <a className="btn btn-primary" href="/talep-olustur">Talep oluştur</a>
             <a className="text-link" href="/nasil-calisir">Sürecin ayrıntıları</a>
           </div>
         </div>
       </section>
 
-      {/* ---------------------------------------------------------------- BÜTÇE REHBERİ */}
-      {first ? (
-        <section className="section" id="butce-rehberi" aria-labelledby="h-rehber">
-          <div className="wrap calc-grid">
-            <div className="calc-intro">
-              <span className="tag">Bütçe rehberi</span>
-              <h2 id="h-rehber" className="h-xl">Bütçen ne kadar iş karşılar?</h2>
-              <p className="lead">Hizmeti seç, bütçeni yaz.</p>
-            </div>
-            <form className="calc" id="hesap" action="/talep-olustur" method="get" aria-label="Bütçe rehberi">
-              <div className="field">
-                <label htmlFor="h-hizmet">Hizmet</label>
-                <select id="h-hizmet" name="hizmet" defaultValue={first.slug}>
-                  {calc.map((x) => (
-                    <option key={x.slug} value={x.slug}>{x.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="field" id="h-kapsam-alan">
-                <label htmlFor="h-kapsam">{first.unit.label}</label>
-                <input id="h-kapsam" name={first.unit.key} inputMode="numeric" placeholder={first.unit.placeholder || ""} />
-              </div>
-              <div className="field">
-                <label htmlFor="h-butce">Hedef bütçen</label>
-                <div className="money">
-                  <input id="h-butce" name="butce" inputMode="numeric" autoComplete="off" placeholder="Örn. 10.000" />
-                  <span aria-hidden="true">₺</span>
-                </div>
-              </div>
-              <div className="calc-result" id="h-sonuc" aria-live="polite">
-                <p className="calc-msg">Kapsamı ve bütçeni gir; rehber burada görünecek.</p>
-              </div>
-              <button type="submit" className="btn btn-signal btn-lg btn-block">Bu bilgilerle talep oluştur</button>
-              <p className="small muted calc-foot">Fiyatlar Brif başlangıç rehberidir. Kesin fiyat, kapsam netleşince yazılı verilir.</p>
-              <script id="hesap-data" type="application/json" dangerouslySetInnerHTML={{ __html: safeJson(calc) }} />
-            </form>
-          </div>
-        </section>
-      ) : null}
-
-      {/* ---------------------------------------------------------------- ÇALIŞMA MODELİ */}
-      <section className="section bg-mint" id="guven" aria-labelledby="h-guven">
-        <div className="wrap trust2">
-          <div className="trust2-intro">
-            <span className="tag">Çalışma modeli</span>
-            <h2 id="h-guven" className="h-xl">Talebini kim değerlendiriyor?</h2>
-            <p className="lead">Uzman ekip okur ve sana döner.</p>
-            <a className="btn btn-primary" href="/talep-olustur">Talebini gönder</a>
-          </div>
-          <ol className="trust2-list">
+      {/* ---------------------------------------------------------------- NEDEN BRİF */}
+      <section className="section" aria-labelledby="h-neden">
+        <div className="wrap">
+          <header className="sec-head2">
+            <h2 id="h-neden" className="h-lg">Neden Brif?</h2>
+          </header>
+          <ul className="why">
             {[
-              ["Uzman okur", "Eksik bilgi varsa önce sorulur."],
-              ["Kapsam yazılı", "Teslim, revizyon ve tarih baştan belli."],
-              ["Bütçene göre yön", "Düşükse reddedilmez, kapsam küçülür."],
-              ["Tek numarayla takip", "Her talebe bir takip numarası."],
-            ].map(([t, d], i) => (
-              <li key={i}>
-                <span className="t2-n" aria-hidden="true"><Icon name={["pk-kisi", "pk-liste", "pk-plan", "pk-gorev"][i]} size={34} /></span>
-                <div>
-                  <h3>{t}</h3>
-                  <p>{d}</p>
-                </div>
+              ["Ücretsiz ve üyeliksiz", "Talep oluşturmak ücretsiz; hesap açman gerekmez.", "M20 6 9 17l-5-5"],
+              ["Yazılı kapsam ve fiyat", "Teslim, revizyon ve tarih iş başlamadan yazılı olarak netleşir.", "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7zM9 15l2 2 4-4"],
+              ["Bütçene göre yön", "Bütçen düşükse reddedilmez; kapsam bütçene göre önerilir.", "M3 3v18h18M7 16l4-4 3 3 5-6"],
+              ["Takip numarası", "Her talebe bir numara verilir; süreç kayıt altında ilerler.", "M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"],
+            ].map(([t, d, ico]) => (
+              <li key={t}>
+                <span className="why-ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d={ico} /></svg>
+                </span>
+                <h3>{t}</h3>
+                <p>{d}</p>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 
       {/* ---------------------------------------------------------------- SSS */}
-      <section className="section" aria-labelledby="h-sss">
+      <section className="section bg-gray" aria-labelledby="h-sss">
         <div className="wrap faq2">
           <div className="faq2-head">
-            <span className="tag">SSS</span>
-            <h2 id="h-sss" className="h-xl">Sık sorulan sorular</h2>
+            <h2 id="h-sss" className="h-lg">Sık sorulan sorular</h2>
             <p><a className="text-link" href="/sss">Tüm sorular</a></p>
           </div>
-          <FaqList items={generalFaq.slice(0, 4)} />
+          <FaqList items={generalFaq.slice(0, 5)} />
         </div>
       </section>
 
-      <section className="section section-tight seo-copy" aria-labelledby="h-hakkinda">
-        <div className="wrap narrow prose">
-          <h2 id="h-hakkinda">Fotoğraf, tasarım, web ve dijital pazarlama hizmeti almak</h2>
-          <p>
-            <a href="/hizmetler/urun-fotografcisi">Ürün fotoğrafçısı</a>, <a href="/hizmetler/grafik-tasarim">grafik tasarımcı</a>, <a href="/hizmetler/reels-video-cekimi">Reels çekimi</a>, <a href="/hizmetler/sosyal-medya-yonetimi">sosyal medya yönetimi</a> ya da <a href="/hizmetler/meta-reklam-yonetimi">Meta reklam yönetimi</a> arıyorsan: form hizmete göre soru sorar, fiyat kapsamla netleşir.
-          </p>
-        </div>
-      </section>
-
-      <CtaBand title="Ne istediğini biliyorsan başlayalım." text="Bilmiyorsan da sorun değil; form seni adım adım yönlendirir." label="Projen için talep oluştur" />
+      <CtaBand title="Projeni anlat, teklifini al." text="Ne istediğinden emin değilsen de form seni adım adım yönlendirir." label="Ücretsiz teklif al" />
     </>
   );
 }
 
+/** Bütçe hesaplayıcı (Fiyat rehberi sayfasında; istemci kodu home.js) */
+export function BudgetCalc({ services }: { services: Service[] }) {
+  const calc = calcData(services);
+  const first = calc[0];
+  if (!first) return null;
+  return (
+    <section className="section" id="butce-rehberi" aria-labelledby="h-rehber">
+      <div className="wrap calc-grid">
+        <div className="calc-intro">
+          <h2 id="h-rehber" className="h-lg">Bütçen ne kadar iş karşılar?</h2>
+          <p className="lead">Hizmeti seç, kapsamı ve bütçeni yaz; rehber aralığı anında gör.</p>
+        </div>
+        <form className="calc" id="hesap" action="/talep-olustur" method="get" aria-label="Bütçe rehberi">
+          <div className="field">
+            <label htmlFor="h-hizmet">Hizmet</label>
+            <select id="h-hizmet" name="hizmet" defaultValue={first.slug}>
+              {calc.map((x) => (
+                <option key={x.slug} value={x.slug}>{x.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="field" id="h-kapsam-alan">
+            <label htmlFor="h-kapsam">{first.unit.label}</label>
+            <input id="h-kapsam" name={first.unit.key} inputMode="numeric" placeholder={first.unit.placeholder || ""} />
+          </div>
+          <div className="field">
+            <label htmlFor="h-butce">Hedef bütçen</label>
+            <div className="money">
+              <input id="h-butce" name="butce" inputMode="numeric" autoComplete="off" placeholder="Örn. 10.000" />
+              <span aria-hidden="true">₺</span>
+            </div>
+          </div>
+          <div className="calc-result" id="h-sonuc" aria-live="polite">
+            <p className="calc-msg">Kapsamı ve bütçeni gir; rehber burada görünecek.</p>
+          </div>
+          <button type="submit" className="btn btn-primary btn-lg btn-block">Bu bilgilerle talep oluştur</button>
+          <p className="small muted calc-foot">Rakamlar başlangıç rehberidir. Kesin fiyat, kapsam netleşince yazılı verilir.</p>
+          <script id="hesap-data" type="application/json" dangerouslySetInnerHTML={{ __html: safeJson(calc) }} />
+        </form>
+      </div>
+    </section>
+  );
+}
+
 export function HowSteps() {
-  const steps: [string, string, string, string][] = [
-    ["İhtiyacını anlat", "Kategoriyi ve hizmeti seç, hizmete özel birkaç soruyu yanıtla. Bilmediğin yerleri boş bırakabilirsin.", "~3 dakika", "pk-fikir"],
-    ["Bütçeni belirle", "Hedef bütçeni yaz ya da teklif istediğini belirt. Rehber, kapsamla uyumunu gösterir.", "TL, kesin değil", "pk-plan"],
-    ["Talebin değerlendirilir", "Talebin alanına uygun uzman ekibe düşer. Eksik bilgi varsa önce sorulur.", "Uzman ekip", "pk-incele"],
-    ["Süreç başlar", "Seçtiğin kanaldan dönüş yapılır; kapsam, tarih ve fiyat yazılı olarak netleşir.", "Yazılı kapsam", "pk-takvim"],
+  const steps: [string, string][] = [
+    ["İhtiyacını anlat", "Kategoriyi seç, hizmete özel birkaç soruyu yanıtla ve bütçeni yaz. Bilmediğin yerleri boş bırakabilirsin."],
+    ["Teklifini al", "Talebin alanında uzman ekibe düşer. Kapsam, tarih ve fiyat yazılı teklif olarak sana iletilir."],
+    ["İşe başla", "Teklifi onayladığında iş başlar; teslim ve revizyonlar baştan belirlenen plana göre ilerler."],
   ];
   return (
-    <div className="steps-ed">
-      <svg className="steps-line" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 40 C 150 0, 250 60, 400 30 S 650 0, 800 32 S 1050 60, 1200 20" fill="none" />
-      </svg>
-      <ol>
-        {steps.map(([t, d, chip, ico], i) => (
-          <li key={i} className="step-ed">
-            <span className="step-top" aria-hidden="true">
-              <span className="step-num">{String(i + 1).padStart(2, "0")}</span>
-              <span className="step-ico"><Icon name={ico} size={40} /></span>
-            </span>
-            <span className="step-dot" aria-hidden="true" />
-            <h3>
-              <span className="sr">Adım {i + 1}: </span>
-              {t}
-            </h3>
-            <p>{d}</p>
-            <span className="step-chip">{chip}</span>
-          </li>
-        ))}
-      </ol>
-    </div>
+    <ol className="steps3">
+      {steps.map(([t, d], i) => (
+        <li key={i}>
+          <span className="s3-n" aria-hidden="true">{i + 1}</span>
+          <h3><span className="sr">Adım {i + 1}: </span>{t}</h3>
+          <p>{d}</p>
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -368,61 +342,23 @@ export function ServicesPage({ services }: { cats: Category[]; services: Service
   const guides = SERVICES.filter((x) => x.page && pages.has(x.page));
   return (
     <>
-      <section className="page-head svc-hero">
-        <div className="wrap svc-narrow svc-hero-grid">
-          <div>
-            <Breadcrumbs items={[{ name: "Ana sayfa", path: "/" }, { name: "Hizmetler", path: "/hizmetler" }]} />
-            <h1>Hizmetler</h1>
-            <p className="lead">Bir kategori seç; alt hizmeti ve detayları talep formunda birlikte belirleyelim.</p>
-            <ul className="svc-hero-facts">
-              <li><Icon name="pk-liste" size={26} />6 kategori, {SERVICES.length} hizmet</li>
-              <li><Icon name="pk-sohbet" size={26} />Hizmete özel sorular</li>
-              <li><Icon name="pk-zaman" size={26} />Yaklaşık 3 dakika</li>
-            </ul>
-          </div>
-          <img className="svc-hero-art" src="/assets/freelancer-masa.webp" alt="" width="820" height="1060" decoding="async" fetchPriority="high" />
+      <PageHead crumbs={[{ name: "Ana sayfa", path: "/ana-sayfa" }, { name: "Hizmetler", path: "/hizmetler" }]} title="Hizmetler" lead={`6 kategoride ${SERVICES.length} hizmet. Kategoriyi seç; alt hizmeti ve detayları talep formunda birlikte belirleyelim.`} />
+      <section className="section section-tight">
+        <div className="wrap">
+          <CatCards />
+          {guides.length ? (
+            <nav className="svc-guides" aria-label="Hizmet rehberleri">
+              <h2 className="h-sm">Hizmet rehberleri</h2>
+              <ul>
+                {guides.map((x) => (
+                  <li key={x.slug}><a href={`/hizmetler/${x.page}`}>{x.name}</a></li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
         </div>
       </section>
-      <div className="wrap svc-narrow svc-page">
-        <ul className="svc-grid">
-          {CATEGORIES.map((c, i) => {
-            const subs = servicesOf(c.slug);
-            return (
-              <li key={c.slug} id={c.slug}>
-                <a className="svc-tile" href={`/talep-olustur?kategori=${c.slug}`} aria-label={`${c.name}: talep oluştur`}>
-                  <span className="svc-art">
-                    <CatImg slug={c.slug} />
-                  </span>
-                  <span className="svc-body2">
-                    <span className="svc-top">
-                      <span className="svc-n">{String(i + 1).padStart(2, "0")}</span>
-                      <span className="svc-count-sm">{subs.length} hizmet</span>
-                    </span>
-                    <span className="svc-title">{c.name}</span>
-                    <span className="svc-short">{c.short}</span>
-                    <span className="svc-go">
-                      Talep oluştur
-                      <Icon name="ok" size={18} />
-                    </span>
-                  </span>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-
-        {guides.length ? (
-          <nav className="svc-guides" aria-label="Hizmet rehberleri">
-            <p className="tag">Hizmet rehberleri</p>
-            <ul>
-              {guides.map((x) => (
-                <li key={x.slug}><a href={`/hizmetler/${x.page}`}>{x.name}</a></li>
-              ))}
-            </ul>
-          </nav>
-        ) : null}
-      </div>
-      <CtaBand title="Aradığın hizmeti bulamadın mı?" text="En yakın kategoriyi seç ve açıklama alanında ihtiyacını anlat." />
+      <CtaBand title="Aradığın hizmeti bulamadın mı?" text="En yakın kategoriyi seç ve açıklama alanında ihtiyacını anlat." label="Talep oluştur" />
     </>
   );
 }
@@ -588,6 +524,7 @@ export function PriceGuidePage({ services }: { services: Service[] }) {
           </p>
         </div>
       </section>
+      <BudgetCalc services={services} />
       <section className="section">
         <div className="wrap">
           <div className="price-table" role="table" aria-label="Hizmetlere göre fiyat rehberi">

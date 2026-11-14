@@ -149,6 +149,8 @@ console.log("DB satır:", rows.length, "dosya:", fileCount);
   ok((await p.textContent(".flash")).includes("hatalı"), "yanlış şifre kabul edildi");
   await p.fill("#pw", process.env.ADMIN_PASSWORD);
   await p.click("button:has-text('Giriş yap')");
+  await p.waitForLoadState();
+  await p.goto(B + "/admin"); // giriş sonrası Özet açılır; talep listesine geç
   await p.waitForSelector(".tbl");
   await p.screenshot({ path: S + "/t-admin-list.png", fullPage: true });
   await p.selectOption("#f-k", "fotograf-video");

@@ -182,7 +182,7 @@ async function handlePublic(ctx: Ctx): Promise<boolean> {
   }
   if (p === "/ana-sayfa") {
     const svcs = services({ publishedOnly: true });
-    renderPage(ctx, { title: "Brif – Fotoğraf, Tasarım ve Dijital Hizmetler", description: s.seo_default_description, path: p, jsonLd: [faqLd(generalFaq.slice(0, 4))] }, <Home s={s} cats={categories()} services={svcs} />, { scripts: ["home"], bodyClass: "page-home" });
+    renderPage(ctx, { title: "Brif – Fotoğraf, Tasarım ve Dijital Hizmetler", description: s.seo_default_description, path: p, jsonLd: [faqLd(generalFaq.slice(0, 5))] }, <Home s={s} cats={categories()} services={svcs} />, { scripts: ["home"], bodyClass: "page-home" });
     return true;
   }
   if (p === "/blog-sablon") {
@@ -238,7 +238,7 @@ async function handlePublic(ctx: Ctx): Promise<boolean> {
     return true;
   }
   if (p === "/fiyat-rehberi") {
-    renderPage(ctx, { title: "Fiyat rehberi: fotoğraf, video ve reklam hizmetlerinde fiyatı ne belirler?", description: "Ürün çekimi, etkinlik fotoğrafı, Reels, video kurgu, sosyal medya ve Meta reklam yönetiminde fiyatı etkileyen unsurlar ve rehber aralıklar.", path: p, breadcrumbs: [{ name: "Ana sayfa", path: "/" }, { name: "Fiyat rehberi", path: p }] }, <PriceGuidePage services={services({ publishedOnly: true })} />);
+    renderPage(ctx, { title: "Fiyat rehberi: fotoğraf, video ve reklam hizmetlerinde fiyatı ne belirler?", description: "Ürün çekimi, etkinlik fotoğrafı, Reels, video kurgu, sosyal medya ve Meta reklam yönetiminde fiyatı etkileyen unsurlar ve rehber aralıklar.", path: p, breadcrumbs: [{ name: "Ana sayfa", path: "/" }, { name: "Fiyat rehberi", path: p }] }, <PriceGuidePage services={services({ publishedOnly: true })} />, { scripts: ["home"] });
     return true;
   }
   if (p === "/sss") {

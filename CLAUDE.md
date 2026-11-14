@@ -25,7 +25,9 @@ Canlı: https://getbrif.com — Cloudflare Workers + D1.
 
 ## Site yapısı
 - Üç "hub" (`src/data/hubs.ts`): `/` Brif Stüdyo (foto/video), `/tasarim` Brif Tasarım (grafik+içerik), `/dijital` Brif Dijital (web, reklam, sosyal). Hub sayfaları: başlık + "Talep oluştur" + kategoriye göre hizmet listesi + kimler için/rehber fiyatlar + SSS. Admin'de örnek iş varsa `<!--ISLER:key-->` ızgarası dolar, yoksa gizli.
-- `/ana-sayfa` eski ana sayfa, `/hizmetler` kategori kutuları, `/talep-olustur` çok adımlı form, `/blog` (worker D1'den render eder), `/fiyat-rehberi`, yasal sayfalar.
+- `/ana-sayfa` genel ana sayfa (logo buraya gider): ortalanmış giriş + popüler hizmetler, 6 sade kategori kartı (`CatCards`), 3 adımlı süreç, Neden Brif, SSS. Bütçe hesaplayıcı `/fiyat-rehberi`'nde (`BudgetCalc`).
+- Menü: Hizmetler (mega) · Nasıl çalışır · Fiyatlar · Blog + Stüdyo/Tasarım/Dijital sekmeleri. Sade tasarım: fotoğraflı kart, kaydırma animasyonu, parlayan arka plan yok.
+- `/hizmetler` kategori kutuları, `/talep-olustur` çok adımlı form, `/blog` (worker D1'den render eder), `/fiyat-rehberi`, yasal sayfalar.
 - Admin: `/admin` (şifre: Cloudflare secret `ADMIN_PASSWORD`). Talepler, notlar, profiller, örnek işler (portfolyo), blog, medya, görsel düzenleyici (`/admin/duzenleyici`).
 - `ayarlar.js` ve `fiyatlar.js` kökte; Eyüp elle düzenleyebilir, export bunları `site/`'a kopyalar.
 
