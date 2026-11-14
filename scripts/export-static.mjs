@@ -101,7 +101,7 @@ try {
   rmSync(tmp, { recursive: true, force: true });
 }
 
-for (const f of ["styles.css", "favicon.svg", "favicon.ico", "favicon-48.png", "favicon-192.png", "og-default.png", "fonts", "assets/site.js", "assets/talep.js", "assets/home.js", "assets/editor.js", "assets/editor.css", "assets/fonts", "assets/ill", "assets/kategori", "assets/logo-yazi.png", "assets/freelancer-masa.webp", "assets/freelancer-masa-cizgi.webp", "logo.svg", "apple-touch-icon.png", "5880f9bc5bf5099b5f0e4be3cb50cf17.txt"]) cpSync(join("public", f), join(OUT, f), { recursive: true });
+for (const f of ["styles.css", "favicon.svg", "favicon.ico", "favicon-48.png", "favicon-192.png", "og-default.png", "fonts", "assets/site.js", "assets/talep.js", "assets/home.js", "assets/editor.js", "assets/editor.css", "assets/fonts", "assets/ill", "assets/kategori", "assets/logo-yazi.png", "assets/freelancer-masa.webp", "assets/freelancer-masa-cizgi.webp", "assets/studyo-cizgi.svg", "logo.svg", "apple-touch-icon.png", "5880f9bc5bf5099b5f0e4be3cb50cf17.txt"]) cpSync(join("public", f), join(OUT, f), { recursive: true });
 if (!existsSync("ayarlar.js")) {
   writeFileSync("ayarlar.js", `// Sitenin düzenlenebilir ayarları. Değiştirdikten sonra yeniden derlemeye gerek yok; bu dosyayı site/ klasörüne kopyalaman yeterli.
 window.SITE_AYAR = {

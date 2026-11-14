@@ -1178,3 +1178,10 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
   .hero3 .hero3-in { position: relative; max-width: 720px; margin: 0 auto; }
   .hero3-ill { position: absolute; top: 50%; transform: translateY(-50%); right: calc(50% + 390px); width: min(460px, calc(50% - 400px)); max-height: 92%; }
 }
+
+/* Giriş: iki yanda birer çizim (solda stüdyo, sağda masa), metin ortada */
+@media (min-width: 861px) {
+  .hero3-ill-l { right: calc(50% + 390px); width: min(420px, calc(50% - 400px)); }
+  .hero3-ill-r { right: auto; left: calc(50% + 390px); width: min(400px, calc(50% - 400px)); }
+}
+@media (max-width: 860px) { .hero3-ill-l { display: none; } }

@@ -89,7 +89,8 @@ export function Home(_: { s: Settings; cats: Category[]; services: Service[] }) 
       <section className="hero3" aria-labelledby="hero-h">
         <span className="hero3-fill" aria-hidden="true" />
         <div className="wrap hero3-grid">
-          <img className="hero3-ill" src="/assets/freelancer-masa-cizgi.webp" alt="" width="1000" height="1293" decoding="async" fetchPriority="high" />
+          <img className="hero3-ill hero3-ill-l" src="/assets/studyo-cizgi.svg" alt="" width="497" height="494" decoding="async" />
+          <img className="hero3-ill hero3-ill-r" src="/assets/freelancer-masa-cizgi.webp" alt="" width="1000" height="1293" decoding="async" fetchPriority="high" />
         <div className="hero3-in">
           <h1 id="hero-h" className="hero3-h">
             İhtiyacını anlat, <span className="h-line">doğru hizmete ulaş.</span>
