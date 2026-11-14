@@ -1206,5 +1206,5 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
 /* ---- Üst menü: daha geniş + hafif cam (blur) efekti */
 .site-header { background: rgba(255, 255, 255, .72); -webkit-backdrop-filter: saturate(160%) blur(14px); backdrop-filter: saturate(160%) blur(14px); border-bottom-color: rgba(25, 25, 25, .08); }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .site-header { background: rgba(255, 255, 255, .96); } }
-@media (min-width: 881px) { .site-header .wrap { max-width: 1440px; } }
+@media (min-width: 881px) { .header-row { min-height: 88px; } }
 .site-header .seg { background: rgba(242, 243, 239, .65); }
