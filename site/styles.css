@@ -1163,3 +1163,11 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
   .hero3-ill { max-width: 300px; margin: 0 auto; max-height: 320px; }
 }
 @media (max-width: 600px) { .hero3-ill { max-width: 220px; margin: 0; } .hero3 .hero3-in { align-items: stretch; } }
+
+/* Popüler kutucuklar beyaz zeminde logo yeşili; yeşil dolum gelince beyaza döner */
+.hero3-pop a { background: var(--signal); border-color: var(--signal); color: var(--ink); transition: background .25s ease, border-color .25s ease; }
+.hero3-pop a:hover { border-color: var(--ink); }
+.hero3-pop a.on-fill { background: var(--white); border-color: var(--white); }
+.hero3-pop a.on-fill:hover { border-color: var(--ink); }
+.hero3-facts li::before { transition: background .25s ease; }
+.hero3-facts li.on-fill::before { background: var(--white); }

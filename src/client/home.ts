@@ -192,7 +192,15 @@ if (grid) {
       raf = 0;
       const p = reduce ? 1 : Math.min(1, Math.max(0, scrollY / Math.max(1, hero.offsetHeight * 0.35)));
       hero.style.setProperty("--fill", p.toFixed(3));
+      // yeşil kenar bir öğenin ortasını geçince öğe beyaza döner (yeşil zeminde yeşil kalmasın)
+      const hr = hero.getBoundingClientRect();
+      const edge = hr.left + hr.width * p;
+      for (const el of swap) {
+        const r = el.getBoundingClientRect();
+        el.classList.toggle("on-fill", edge > r.left + r.width / 2);
+      }
     };
+    const swap = Array.from(hero.querySelectorAll<HTMLElement>(".hero3-pop a, .hero3-facts li"));
     set();
     addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(set); }, { passive: true });
     addEventListener("resize", set);
