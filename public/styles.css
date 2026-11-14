@@ -1171,3 +1171,10 @@ code { background: var(--paper); padding: 2px 6px; border-radius: 4px; font-size
 .hero3-pop a.on-fill:hover { border-color: var(--ink); }
 .hero3-facts li::before { transition: background .25s ease; }
 .hero3-facts li.on-fill::before { background: var(--white); }
+
+/* Giriş: metin sayfanın ortasında, çizim solda (metne çarpmadan) */
+@media (min-width: 861px) {
+  .hero3-grid { display: block; position: static; }
+  .hero3 .hero3-in { position: relative; max-width: 720px; margin: 0 auto; }
+  .hero3-ill { position: absolute; top: 50%; transform: translateY(-50%); right: calc(50% + 390px); width: min(460px, calc(50% - 400px)); max-height: 92%; }
+}
