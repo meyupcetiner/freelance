@@ -107,10 +107,13 @@ export async function recordHit(req: Request, db: DB) {
 
   const cf = ((req as unknown as { cf?: Record<string, string> }).cf) || {};
   let x = BOT_RE.test(ua) || !req.headers.get("Accept-Language") || d.wd || DC_RE.test(String(cf.asOrganization || "")) ? 2 : 0;
+  // x: 0 gerçek, 1 sen (admin çerezi/cihazı), 2 bot/sunucu, 3 yurt dışı
+  if (!x && /(?:^|;\s*)brif_ben=1/.test(req.headers.get("Cookie") || "")) x = 1;
   if (!x) {
     const a = await db.prepare("SELECT t FROM admin_cihaz WHERE k = ?").bind(await deviceKey(req)).first<{ t: number }>();
     if (a && now - a.t < 30 * DAY) x = 1;
   }
+  if (!x && cf.country && cf.country !== "TR") x = 3;
   await db.prepare("INSERT INTO ziyaretler (t, vid, p, ti, e, src, city, dev, x, pv, ex, il, ulke) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
     .bind(now, vid, p, s(d.ti, 160), e, !e && d.f ? srcOf(s(d.r, 400), ua, s(d.u, 40)) : "", s(cf.city, 60), devOf(ua), x, e ? "" : pv, s(d.ex, 120), s(cf.region, 60), s(cf.country, 2))
     .run();
@@ -181,9 +184,9 @@ export async function stats(db: DB, days: number, opts: { tr?: boolean } = {}) {
   await setup(db);
   const now = Date.now();
   const all = await rowsSince(db, now - days * DAY);
-  const skipped = { admin: all.filter((r) => r.x === 1 && !r.e).length, bot: all.filter((r) => r.x === 2 && !r.e).length, yabanci: 0 };
-  let real = all.filter((r) => !r.x);
-  if (opts.tr) { const before = real.filter((r) => !r.e).length; real = real.filter((r) => !r.ulke || r.ulke === "TR"); skipped.yabanci = before - real.filter((r) => !r.e).length; }
+  const skipped = { admin: all.filter((r) => r.x === 1 && !r.e).length, bot: all.filter((r) => r.x === 2 && !r.e).length, yabanci: all.filter((r) => (r.x === 3 || (!r.x && r.ulke && r.ulke !== "TR")) && !r.e).length };
+  const real = all.filter((r) => !r.x && (!r.ulke || r.ulke === "TR"));
+  void opts;
   const views = real.filter((r) => !r.e);
   const ev = real.filter((r) => r.e);
   const sess = oturumlar(real);

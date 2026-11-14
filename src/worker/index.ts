@@ -916,8 +916,8 @@ const sonucRozet = (o: Oturum) => (o.sonuc === "talep" ? '<span class="badge ton
 
 async function ziyaretView(env: Env, url: URL) {
   const days = [1, 7, 30, 90].includes(Number(url.searchParams.get("gun"))) ? Number(url.searchParams.get("gun")) : 7;
-  const tr = url.searchParams.get("tr") === "1";
-  const s = await ziyaretStats(env.DB, days, { tr });
+  const tr = false;
+  const s = await ziyaretStats(env.DB, days);
   const talepN = (await env.DB.prepare("SELECT COUNT(*) AS n FROM talepler WHERE created_at > ?").bind(new Date(Date.now() - days * 864e5).toISOString()).first<{ n: number }>())?.n ?? 0;
   const conv = s.visitors ? ((talepN / s.visitors) * 100).toFixed(1).replace(".", ",") : "0";
   const q = (o: Record<string, string>) => "?" + new URLSearchParams({ gun: String(days), ...(tr ? { tr: "1" } : {}), ...o }).toString();
@@ -928,12 +928,12 @@ async function ziyaretView(env: Env, url: URL) {
   const huniRow = (l: string, n: number) => `<li><span class="vbar-k">${l}</span><span class="vbar-n">${nf(n)}${H.ziyaret ? ` <small class="muted">%${Math.round((n / H.ziyaret) * 100)}</small>` : ""}</span><span class="vbar-b" style="width:${Math.max(3, Math.round((n / Math.max(1, H.ziyaret)) * 100))}%"></span></li>`;
   return layout(
     "Ziyaretçiler",
-    `<div class="adm-head"><h1>Ziyaretçiler</h1><nav class="vtabs" aria-label="Zaman aralığı">${tabs}${trLink}</nav></div>
+    `<div class="adm-head"><h1>Ziyaretçiler</h1><nav class="vtabs" aria-label="Zaman aralığı">${tabs}</nav></div>
 <div class="kpis"><div><span class="kpi-n">${nf(s.visitors)}</span><span class="kpi-l">Tekil ziyaretçi</span></div><div><span class="kpi-n">${nf(s.visits)}</span><span class="kpi-l">Ziyaret</span></div><div><span class="kpi-n">${sureFmt(s.ortSure)}</span><span class="kpi-l">Ortalama ziyaret süresi</span></div><div><span class="kpi-n">${nf(talepN)}</span><span class="kpi-l">Talep · %${conv} dönüşüm</span></div></div>
 <div class="kpis kpis-sm"><div><span class="kpi-n">${nf(s.today)}</span><span class="kpi-l">Bugün</span></div><div><span class="kpi-n">${nf(s.views)}</span><span class="kpi-l">Sayfa görüntüleme</span></div><div><span class="kpi-n">${s.visits ? (s.views / s.visits).toFixed(1).replace(".", ",") : "0"}</span><span class="kpi-l">Ziyaret başına sayfa</span></div><div><span class="kpi-n">%${s.bounce}</span><span class="kpi-l">Tek sayfada çıkan</span></div></div>
 ${days > 1 ? `<section class="panel"><h2 class="h-sm">Günlük ziyaretçi</h2>${dailyChart(s.daily, days)}</section>` : ""}
 <div class="grid-2"><section class="panel"><h2 class="h-sm">Nereden geliyorlar?</h2>${barList(s.sources, s.visits)}</section>
-<section class="panel"><h2 class="h-sm">Hangi ilden?</h2>${barList(s.iller, s.visits)}${!tr && s.ulkeler.some(([k]) => k !== "TR" && k !== "?") ? `<h3 class="h-xs vsub">Ülke</h3>${barList(s.ulkeler.map(([k, n]) => [ULKE[k] || k, n] as [string, number]), s.visits)}` : ""}</section></div>
+<section class="panel"><h2 class="h-sm">Hangi ilden?</h2>${barList(s.iller, s.visits)}</section></div>
 <div class="grid-2"><section class="panel"><h2 class="h-sm">Neyle ilgileniyorlar?</h2>${barList(s.alanlar, s.visits)}${s.formHizmet.length ? `<h3 class="h-xs vsub">Formda seçilen hizmet</h3>${barList(s.formHizmet.map(([k, n]) => [svcAd(k), n] as [string, number]), s.formHizmet[0][1])}` : ""}</section>
 <section class="panel"><h2 class="h-sm">Talebe giden yol</h2><ul class="vbar">${huniRow("Siteye giren", H.ziyaret)}${huniRow("Talep formunu açan", H.form)}${huniRow("Formu doldurmaya başlayan", H.basla)}${huniRow("3. adıma gelen", H.adim3)}${huniRow("Talep gönderen", H.talep)}</ul></section></div>
 <section class="panel"><h2 class="h-sm">Sayfalar <span class="muted small">görüntüleme · ortalama süre</span></h2>${
@@ -952,7 +952,7 @@ ${days > 1 ? `<section class="panel"><h2 class="h-sm">Günlük ziyaretçi</h2>${
             .join("")}</tbody></table></div>`
         : `<div class="empty"><h2>Henüz ziyaret yok</h2><p>Site ziyaret edildikçe veriler burada görünür.</p></div>`
     }</section>
-<p class="small muted">Çerez kullanılmaz, IP adresi saklanmaz. Sayılmayanlar: botlar ve sunucu kaynaklı trafik (${nf(s.skipped.bot)}), senin cihazın (${nf(s.skipped.admin)})${tr ? `, yurt dışı (${nf(s.skipped.yabanci)})` : ""}. Süre: sekmenin açık ve önde olduğu süre. Ziyaret: aynı kişinin 30 dakika içindeki gezintisi.</p>`,
+<p class="small muted">Çerez kullanılmaz, IP adresi saklanmaz. Yalnızca Türkiye'den gerçek ziyaretler gösterilir. Sistemin ayıkladıkları: senin ziyaretlerin (${nf(s.skipped.admin)}), yurt dışı (${nf(s.skipped.yabanci)}), bot ve sunucu trafiği (${nf(s.skipped.bot)}) sayfa görüntülemesi. Süre: sekmenin açık ve önde olduğu süre. Ziyaret: aynı kişinin 30 dakika içindeki gezintisi.</p>`,
   );
 }
 
@@ -1286,7 +1286,16 @@ export default {
       if (url.pathname === "/api/saglik") return json({ ok: true, hizmet: SERVICES.length, kategori: CATEGORIES.length });
       const md = url.pathname.match(/^\/api\/medya\/(\d+)$/);
       if (md && req.method === "GET") return await apiMedya(env, Number(md[1]));
-      if (url.pathname === "/admin" || url.pathname.startsWith("/admin/")) return await admin(req, env, url);
+      if (url.pathname === "/admin" || url.pathname.startsWith("/admin/")) {
+        const r = await admin(req, env, url);
+        // Admin'e giren cihaz "ben" çerezi alır: bu cihazdan siteye yapılan ziyaretler sayılmaz
+        if (!/(?:^|;\s*)brif_ben=1/.test(req.headers.get("Cookie") || "") && (await isAuthed(req, env))) {
+          const res = new Response(r.body, r);
+          res.headers.append("Set-Cookie", "brif_ben=1; Path=/; Max-Age=31536000; Secure; SameSite=Lax");
+          return res;
+        }
+        return r;
+      }
       return await servePage(req, env, url);
     } catch (e) {
       console.error("worker hata", (e as Error).message);
